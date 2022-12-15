@@ -23,7 +23,7 @@
 #
 [Packages]
   MdePkg/MdePkg.dec
-  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
+  Platform/Bosc/U5SeriesPkg/U5SeriesPkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
 
 [LibraryClasses]
