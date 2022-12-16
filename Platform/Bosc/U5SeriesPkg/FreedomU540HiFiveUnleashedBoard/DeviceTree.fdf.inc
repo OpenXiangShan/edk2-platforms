@@ -32,4 +32,4 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-INF RuleOverride = DTB Platform/SiFive/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/DeviceTree/U540DeviceTree.inf
+INF RuleOverride = DTB Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/DeviceTree/U540DeviceTree.inf
