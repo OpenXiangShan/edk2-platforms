@@ -21,7 +21,7 @@
   SUPPORTED_ARCHITECTURES        = RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.fdf
+  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/U540.fdf
 
   #
   # Enable below options may cause build error or may not work on
@@ -168,7 +168,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
   Edk2OpensbiPlatformWrapperLib|Platform/RISC-V/PlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
-  RiscVSpecialPlatformLib|Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
+  RiscVSpecialPlatformLib|Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
@@ -504,7 +504,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
-  Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/DeviceTree/U540DeviceTree.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/U540DeviceTree.inf
 
   #
   # SMBIOS Support

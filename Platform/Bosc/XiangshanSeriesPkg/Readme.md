@@ -23,12 +23,12 @@ build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/FreedomU500VC707Boa
 This is a sample platform package used for the SiFive Freedom U540 HiFive Unleashed
 development board, please refer to "SiFive Freedom U540-C000 Manual" on
 https://www.sifive.com. The binary built from
-Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/ can run on both
+Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/ can run on both
 hardware and [QEMU](https://git.qemu.org/?p=qemu.git;a=summary).
 It is confirmed that version 5.0 of QEMU can boot with this  firmware to EFI shell
 and Linux user space.
 ```
-build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.dsc
+build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/U540.dsc
 ```
 For running U540 edk2 binary on QEMU, use qemu-system-riscv64 under riscv64-softmmu
 to launch the binary with below parameters,
@@ -51,7 +51,7 @@ Refer to [Readme.md](https://github.com/tianocore/edk2-platforms/blob/master/Pla
 Currently the binary built from U500 edk2 package can boot SiFive Freedom U500 VC707
 FPGA to EFI shell with console in/out enabled.
 
-**FreedomU540HiFiveUnleashedBoard**
+**NanhuFPGABoard**
 Currently the binary built from U540 edk2 package can boot SiFive Freedom U540 HiFive
 Unleashed to EFI shell with console in/out enabled and Linux kernel. Please refer to
 https://github.com/riscv/riscv-uefi-edk2-docs for booting to Linux kernel.
