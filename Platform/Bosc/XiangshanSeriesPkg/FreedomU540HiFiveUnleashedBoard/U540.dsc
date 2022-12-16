@@ -21,7 +21,7 @@
   SUPPORTED_ARCHITECTURES        = RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.fdf
+  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.fdf
 
   #
   # Enable below options may cause build error or may not work on
@@ -85,7 +85,7 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  SerialPortLib|Platform/Bosc/U5SeriesPkg/Library/SerialIoLib/SerialIoLib.inf
+  SerialPortLib|Platform/Bosc/XiangshanSeriesPkg/Library/SerialIoLib/SerialIoLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -149,7 +149,7 @@
 !endif
   RiscVCpuLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
   RiscVEdk2SbiLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVEdk2SbiLib/RiscVEdk2SbiLib.inf
-  RiscVPlatformTimerLib|Platform/Bosc/U5SeriesPkg/Library/RiscVPlatformTimerLib/RiscVPlatformTimerLib.inf
+  RiscVPlatformTimerLib|Platform/Bosc/XiangshanSeriesPkg/Library/RiscVPlatformTimerLib/RiscVPlatformTimerLib.inf
   #MachineModeTimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVReadMachineModeTimer/MachineModeTimerLib/MachineModeTimerLib.inf
   MachineModeTimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVReadMachineModeTimer/EmulatedMachineModeTimerLib/EmulatedMachineModeTimerLib.inf
   CpuExceptionHandlerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVExceptionLib/CpuExceptionHandlerDxeLib.inf
@@ -168,7 +168,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
   Edk2OpensbiPlatformWrapperLib|Platform/RISC-V/PlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
-  RiscVSpecialPlatformLib|Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
+  RiscVSpecialPlatformLib|Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
@@ -198,7 +198,7 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   # RISC-V platform PEI core entry point.
   PeiCoreEntryPoint|Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  PlatformSecPpiLib|Platform/Bosc/U5SeriesPkg/Library/PlatformSecPpiLib/PlatformSecPpiLib.inf
+  PlatformSecPpiLib|Platform/Bosc/XiangshanSeriesPkg/Library/PlatformSecPpiLib/PlatformSecPpiLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -227,7 +227,7 @@
 # RISC-V core libraries
 #
   SiliconSiFiveU54CoreInfoLib|Silicon/SiFive/U54/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
-  RiscVCoreplexInfoLib|Platform/Bosc/U5SeriesPkg/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
+  RiscVCoreplexInfoLib|Platform/Bosc/XiangshanSeriesPkg/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   TimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVTimerLib/BaseRiscVTimerLib.inf
@@ -459,8 +459,8 @@
   #
   # RISC-V Platform module
   #
-  Platform/Bosc/U5SeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
-  Platform/Bosc/U5SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 
   #
   # RISC-V Core module
@@ -504,7 +504,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
-  Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/DeviceTree/U540DeviceTree.inf
+  Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/DeviceTree/U540DeviceTree.inf
 
   #
   # SMBIOS Support

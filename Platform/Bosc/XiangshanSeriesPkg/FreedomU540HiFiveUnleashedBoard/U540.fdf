@@ -127,7 +127,7 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  Platform/Bosc/U5SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 }
 
 #
@@ -147,10 +147,10 @@ INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
 # RISC-V Platform Drivers
-INF  Platform/Bosc/U5SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 
 # RISC-V Core Drivers
-INF  Platform/Bosc/U5SeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
 INF  Silicon/RISC-V/ProcessorPkg/Universal/CpuDxe/CpuDxe.inf
 INF  Silicon/RISC-V/ProcessorPkg/Universal/SmbiosDxe/RiscVSmbiosDxe.inf
 

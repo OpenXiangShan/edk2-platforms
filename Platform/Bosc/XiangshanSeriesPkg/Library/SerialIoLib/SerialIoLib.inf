@@ -24,7 +24,7 @@
   MdePkg/MdePkg.dec
   Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
-  Platform/Bosc/U5SeriesPkg/U5SeriesPkg.dec
+  Platform/Bosc/XiangshanSeriesPkg/U5SeriesPkg.dec
 
 [LibraryClasses]
   BaseLib

@@ -5,7 +5,7 @@ Freedom U540 HiFive Unleashed platform.
 
 Both platforms are built with below common edk2 packages under edk2-platforms
 repository,
-- [**U5SeriesPkg**](https://github.com/tianocore/edk2-platforms/tree/master/Platform/Bosc/U5SeriesPkg)
+- [**U5SeriesPkg**](https://github.com/tianocore/edk2-platforms/tree/master/Platform/Bosc/XiangshanSeriesPkg)
 - [**RiscVPlatformPkg**](https://github.com/tianocore/edk2-platforms/tree/master/Platform/RISC-V/PlatformPkg)
 - [**RiscVProcessorPkg**](https://github.com/tianocore/edk2-platforms/tree/master/Silicon/RISC-V/ProcessorPkg)
 
@@ -13,22 +13,22 @@ repository,
 This is a sample platform package used against to SiFive Freedom U500
 VC707 FPGA Dev Kit, please refer to "SiFive Freedom U500 VC707 FPGA Getting
 Started Guide" on https://www.sifive.com/documentation.
-The binary built from Platform/Bosc/U5SeriesPkg/FreedomU500VC707Board can run
+The binary built from Platform/Bosc/XiangshanSeriesPkg/FreedomU500VC707Board can run
 on U500 VC707 FPGA board.
 ```
-build -a RISCV64 -t GCC5 -p Platform/Bosc/U5SeriesPkg/FreedomU500VC707Board/U500.dsc
+build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/FreedomU500VC707Board/U500.dsc
 ```
 
 ## U540 Platform
 This is a sample platform package used for the SiFive Freedom U540 HiFive Unleashed
 development board, please refer to "SiFive Freedom U540-C000 Manual" on
 https://www.sifive.com. The binary built from
-Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/ can run on both
+Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/ can run on both
 hardware and [QEMU](https://git.qemu.org/?p=qemu.git;a=summary).
 It is confirmed that version 5.0 of QEMU can boot with this  firmware to EFI shell
 and Linux user space.
 ```
-build -a RISCV64 -t GCC5 -p Platform/Bosc/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.dsc
+build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.dsc
 ```
 For running U540 edk2 binary on QEMU, use qemu-system-riscv64 under riscv64-softmmu
 to launch the binary with below parameters,
