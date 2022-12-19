@@ -226,7 +226,7 @@
 #
 # RISC-V core libraries
 #
-  SiliconSiFiveU54CoreInfoLib|Silicon/SiFive/U54/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
+  SiliconSiFiveU54CoreInfoLib|Silicon/Bosc/U54/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
   RiscVCoreplexInfoLib|Platform/Bosc/XiangshanSeriesPkg/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
 
 [LibraryClasses.common.DXE_CORE]

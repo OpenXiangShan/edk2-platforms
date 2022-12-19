@@ -1,7 +1,7 @@
 ## @file
 #  Library instance to create core information HOB
 #
-#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -9,11 +9,11 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001b
-  BASE_NAME                      = SiliconSiFiveU5MCCoreplexInfoLib
-  FILE_GUID                      = 4E397A71-5164-4E69-9884-70CBE2740AAB
+  BASE_NAME                      = SiliconSiFiveU54CoreInfoLib
+  FILE_GUID                      = 483DE090-267E-4278-A0A1-15D9836780EA
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = RiscVCoreplexInfoLib
+  LIBRARY_CLASS                  = SiliconSiFiveU54CoreInfoLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -27,32 +27,25 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
   Platform/Bosc/XiangshanSeriesPkg/XiangshanSeriesPkg.dec
   Silicon/Bosc/Bosc.dec
-  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
-  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
 
 [LibraryClasses]
   BaseLib
-  MemoryAllocationLib
   PcdLib
+  MemoryAllocationLib
   PrintLib
-  RiscVFirmwareContextLib
-  SiliconSiFiveU54CoreInfoLib
-
-[Guids]
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid
-
-[Ppis]
+  FirmwareContextProcessorSpecificLib
+  RiscVEdk2SbiLib
 
 [FixedPcd]
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSpecificDataGuidHobGuid
   gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosGuidHobGuid
   gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType4GuidHobGuid
   gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType7GuidHobGuid
   gEfiSiFiveSiliconTokenSpaceGuid.PcdSiFiveU54CoreGuid
-  gEfiSiFiveSiliconTokenSpaceGuid.PcdSiFiveE51CoreGuid
   gEfiSiFiveSiliconTokenSpaceGuid.PcdSiFiveU5MCCoreplexGuid
   gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores
   gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
