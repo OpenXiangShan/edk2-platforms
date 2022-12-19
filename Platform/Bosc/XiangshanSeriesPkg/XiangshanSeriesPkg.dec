@@ -1,7 +1,7 @@
-## @file  U5SeriesPkg.dec
-# This Package provides modules and libraries.for SiFive U5 series platforms.
+## @file  XiangshanSeriesPkg.dec
+# This Package provides modules and libraries.for Bosc Xiangshan series platforms.
 #
-# Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright 2022 BOSC
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -9,9 +9,9 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x0001001b
-  PACKAGE_NAME                   = U5SeriesPkg
-  PACKAGE_UNI_FILE               = U5SeriesPkg.uni
-  PACKAGE_GUID                   = AD6E43CA-7FED-4CEA-8151-68B2C5F12B3A
+  PACKAGE_NAME                   = XiangshanSeriesPkg
+  PACKAGE_UNI_FILE               = XiangshanSeriesPkg.uni
+  PACKAGE_GUID                   = 9c07e68c-011b-4acb-9195-55453997427b
   PACKAGE_VERSION                = 1.0
 
 [Includes]
@@ -20,7 +20,7 @@
 [LibraryClasses]
 
 [Guids]
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid  = {0x725B804B, 0x10B5, 0x4326, { 0xAD, 0xFF, 0x59, 0xCE, 0x6E, 0xFD, 0x5B, 0x36 }}
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid  = {0x12115609, 0x4da5, 0x41cb, { 0x9c, 0x27, 0x74, 0xa1, 0x8e, 0x59, 0x69, 0xd0 }}
 
 [PcdsFixedAtBuild]
   gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock|0x0|UINT32|0x00001000
