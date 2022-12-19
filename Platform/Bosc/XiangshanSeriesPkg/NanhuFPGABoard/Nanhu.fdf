@@ -7,7 +7,7 @@
 #
 # Platform definitions
 #
-!include U540.fdf.inc
+!include Nanhu.fdf.inc
 
 #
 # Build the variable store and the firmware code as one unified flash device
