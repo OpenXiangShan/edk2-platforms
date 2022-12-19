@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /* Copyright (c) 2018-2019 SiFive, Inc */
 
-#include "fu540-c000.dtsi"
+#include "nanhu.dtsi"
 /*#include <dt-bindings/gpio/gpio.h>*/
 #include "gpio.h"
 

@@ -18,7 +18,7 @@
 [Sources]
   gpio.h
   hifive-unleashed-a00.dts
-  fu540-c000.dtsi
+  nanhu.dtsi
   sifive-fu540-prci.h
 
 [Packages]
