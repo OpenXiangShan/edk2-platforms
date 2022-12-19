@@ -24,7 +24,7 @@
 #
 
 [Sources]
- SifiveFu540.c
+ BoscNanhu.c
 
 [Packages]
   MdePkg/MdePkg.dec
