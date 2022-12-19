@@ -1,7 +1,7 @@
 ## @file  XiangshanSeriesPkg.dec
 # This Package provides modules and libraries.for Bosc Xiangshan series platforms.
 #
-#  Copyright 2022 BOSC
+#  Copyright (c) 2022, BOSC. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
