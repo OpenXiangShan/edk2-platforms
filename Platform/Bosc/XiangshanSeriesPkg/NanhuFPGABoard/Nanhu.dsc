@@ -21,7 +21,7 @@
   SUPPORTED_ARCHITECTURES        = RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/U540.fdf
+  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Nanhu.fdf
 
   #
   # Enable below options may cause build error or may not work on
