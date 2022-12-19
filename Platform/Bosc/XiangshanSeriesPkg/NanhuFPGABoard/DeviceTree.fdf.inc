@@ -32,4 +32,4 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-INF RuleOverride = DTB Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/U540DeviceTree.inf
+INF RuleOverride = DTB Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/NanhuDeviceTree.inf

@@ -504,7 +504,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/U540DeviceTree.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/NanhuDeviceTree.inf
 
   #
   # SMBIOS Support
