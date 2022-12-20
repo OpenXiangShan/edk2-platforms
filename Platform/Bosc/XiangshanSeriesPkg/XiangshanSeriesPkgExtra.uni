@@ -1,0 +1,12 @@
+## @file  XiangshanSeriesPkg.dec
+# Bosc Xiangshan Series Package Localized Strings and Content.
+#
+#  Copyright (c) 2022, BOSC. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#string STR_PROPERTIES_PACKAGE_NAME
+#language en-US
+"Bosc Xiangshan series platform package"
