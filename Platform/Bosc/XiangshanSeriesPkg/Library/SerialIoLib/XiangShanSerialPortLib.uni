@@ -1,9 +1,7 @@
 // /** @file
 // Library instance for SerialIo library class
 //
-// Library instance for SerialIO library class.
-//
-// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2022, BOSC. All rights reserved.
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //

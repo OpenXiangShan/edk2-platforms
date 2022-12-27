@@ -9,9 +9,9 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001b
-  BASE_NAME                      = U5SerialPortLib
-  MODULE_UNI_FILE                = U5SerialPortLib.uni
-  FILE_GUID                      = FCC4FD2B-2FF6-4FFA-B363-7C1111E5DCE9
+  BASE_NAME                      = XSSerialPortLib
+  MODULE_UNI_FILE                = XSSerialPortLib.uni
+  FILE_GUID                      = E8FCA774-8101-11ED-A252-00155DEFF75E
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib

@@ -1,48 +1,52 @@
 /** @file
-  UART Serial Port library functions
+ UART Serial Port library functions
 
-  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+ Copyright (c) 2022, BOSC. All rights reserved.
 
-  SPDX-License-Identifier: BSD-2-Clause-Patent
+ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/SerialPortLib.h>
-#include <Include/SifiveU5Uart.h>
+#include <Include/BoscXSUart.h>
 
 //---------------------------------------------
 // UART Register Offsets
 //---------------------------------------------
+#define UART_RBR_OFFSET		0	/* In:  Recieve Buffer Register */
+#define UART_THR_OFFSET		0	/* Out: Transmitter Holding Register */
+#define UART_DLL_OFFSET		0	/* Out: Divisor Latch Low */
+#define UART_IER_OFFSET		1	/* I/O: Interrupt Enable Register */
+#define UART_DLM_OFFSET		1	/* Out: Divisor Latch High */
+#define UART_FCR_OFFSET		2	/* Out: FIFO Control Register */
+#define UART_IIR_OFFSET		2	/* I/O: Interrupt Identification Register */
+#define UART_LCR_OFFSET		3	/* Out: Line Control Register */
+#define UART_MCR_OFFSET		4	/* Out: Modem Control Register */
+#define UART_LSR_OFFSET		5	/* In:  Line Status Register */
+#define UART_MSR_OFFSET		6	/* In:  Modem Status Register */
+#define UART_SCR_OFFSET		7	/* I/O: Scratch Register */
+#define UART_MDR1_OFFSET	8	/* I/O:  Mode Register */
 
-#define UART_REG_IP     5
-#define UART_IP_RXWM    0x02
+#define UART_LSR_FIFOE		0x80	/* Fifo error */
+#define UART_LSR_TEMT		0x40	/* Transmitter empty */
+#define UART_LSR_THRE		0x20	/* Transmit-hold-register empty */
+#define UART_LSR_BI		0x10	/* Break interrupt indicator */
+#define UART_LSR_FE		0x08	/* Frame error indicator */
+#define UART_LSR_PE		0x04	/* Parity error indicator */
+#define UART_LSR_OE		0x02	/* Overrun error indicator */
+#define UART_LSR_DR		0x01	/* Receiver data ready */
+#define UART_LSR_BRK_ERROR_BITS	0x1E	/* BI, FE, PE, OE bits */
 
-
-#define UART_REG_TXFIFO     0
-#define UART_REG_RXFIFO     1
-#define UART_REG_TXCTRL     2
-#define UART_REG_RXCTRL     3
-#define UART_REG_IE         4
-#define UART_REG_IP         5
-#define UART_REG_DIV        6
-
-#define UART_TXFIFO_FULL    0x80000000
-#define UART_RXFIFO_EMPTY   0x80000000
-#define UART_RXFIFO_DATA    0x000000ff
-#define UART_TXCTRL_TXEN    0x1
-#define UART_RXCTRL_RXEN    0x1
 
 //---------------------------------------------
 // UART Settings
 //---------------------------------------------
-
-#define UART_BAUDRATE  115200
+#define UART_BAUDRATE  9600
 #define SYS_CLK        FixedPcdGet32(PcdU5PlatformSystemClock)
+BOOLEAN Initiated = FALSE;
 
-BOOLEAN Initiated = TRUE;
 
 /**
   Get value from serial port register.
@@ -57,7 +61,6 @@ UINT32 GetReg (
   )
 {
   STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
-
   return readl ((volatile void *)(uart + RegIndex));
 }
 
@@ -74,7 +77,6 @@ VOID SetReg (
   )
 {
   STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
-
   writel (Value, (volatile void *)(uart + RegIndex));
 }
 
@@ -84,13 +86,13 @@ VOID SetReg (
   @param Ch        The character to serial port.
 
 **/
-VOID SifiveUartPutChar (
+VOID UartPutChar (
   IN UINT8 Ch
   )
 {
-  while (GetReg (UART_REG_TXFIFO) & UART_TXFIFO_FULL);
-
-  SetReg (UART_REG_TXFIFO, Ch);
+  while((GetReg(UART_LSR_OFFSET) & UART_LSR_THRE) == 0)
+    ;
+  SetReg(UART_THR_OFFSET, Ch);
 }
 
 /**
@@ -99,27 +101,16 @@ VOID SifiveUartPutChar (
   @retval character        The character from serial port.
 
 **/
-UINT32 SifiveUartGetChar (VOID)
+UINT32 UartGetChar (VOID)
 {
-  UINT32 Ret;
-
-  Ret = GetReg (UART_REG_RXFIFO);
-  if (!(Ret & UART_RXFIFO_EMPTY)) {
-    return Ret & UART_RXFIFO_DATA;
-  }
+  if (GetReg(UART_LSR_OFFSET) & UART_LSR_DR)
+    return GetReg(UART_RBR_OFFSET);
   return -1;
 }
+
 /**
-  Find minimum divisor divides in_freq to max_target_hz;
-  Based on uart driver n SiFive FSBL.
-
-  f_baud = f_in / (div + 1) => div = (f_in / f_baud) - 1
-  The nearest integer solution requires rounding up as to not exceed max_target_hz.
-  div  = ceil(f_in / f_baud) - 1
-   = floor((f_in - 1 + f_baud) / f_baud) - 1
-  This should not overflow as long as (f_in - 1 + f_baud) does not exceed
-  2^32 - 1, which is unlikely since we represent frequencies in kHz.
-
+  buadrate = serial clock freq / ( 16 * divisor )
+  divisor  =  serial clock freq / ( 16 * buadrate )
   @param Freq         The given clock to UART.
   @param MaxTargetHZ  Target baudrate.
 
@@ -130,15 +121,11 @@ UartMinClkDivisor (
   IN UINT64 MaxTargetHZ
   )
 {
-    UINT64 Quotient;
-
-    Quotient = (Freq + MaxTargetHZ - 1) / (MaxTargetHZ);
-    if (Quotient == 0) {
-        return 0;
-    } else {
-        return Quotient - 1;
-    }
+  UINT64 Quotient;
+  Quotient = Freq / ( MaxTargetHZ * 16 );
+  return Quotient;
 }
+
 /**
   Initialize the serial device hardware.
 
@@ -159,14 +146,15 @@ SerialPortInitialize (
   UINT32 Divisor;
   UINT32 CurrentDivisor;
 
-  Divisor = UartMinClkDivisor (SYS_CLK / 2, UART_BAUDRATE);
+  Divisor = UartMinClkDivisor (SYS_CLK, UART_BAUDRATE);
   if (Divisor == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  CurrentDivisor = GetReg(UART_REG_DIV);
+  CurrentDivisor = (GetReg(UART_DLL_OFFSET) & 0xff) | ((GetReg(UART_DLM_OFFSET) & 0xff) << 8);
   if (Divisor != CurrentDivisor) {
-    sifive_uart_init (FixedPcdGet32(PcdU5UartBase), SYS_CLK / 2, UART_BAUDRATE);
+    uart8250_init(FixedPcdGet32(PcdU5UartBase), SYS_CLK, UART_BAUDRATE, 2, 4);
   }
+  Initiated = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -203,7 +191,7 @@ SerialPortWrite (
   }
 
   for(Index = 0; Index < NumberOfBytes; Index ++) {
-    SifiveUartPutChar (Buffer [Index]);
+    UartPutChar (Buffer [Index]);
   }
 
   return Index;
@@ -234,7 +222,7 @@ SerialPortRead (
   }
 
   for (Index = 0; Index < NumberOfBytes; Index ++) {
-    Buffer [Index] = (UINT8)SifiveUartGetChar ();
+    Buffer [Index] = (UINT8)UartGetChar ();
   }
 
   return Index;
@@ -257,18 +245,19 @@ SerialPortPoll (
   VOID
   )
 {
-  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
-  UINT32 IP;
+  // STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
+  // UINT32 IP;
 
-  if (Initiated == FALSE) {
-    return FALSE;
-  }
-  IP = MmioRead32 ((UINTN)(uart + UART_REG_IP));
-  if(IP & UART_IP_RXWM) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
+  // if (Initiated == FALSE) {
+  //   return FALSE;
+  // }
+  // IP = MmioRead32 ((UINTN)(uart + UART_REG_IP));
+  // if(IP & UART_IP_RXWM) {
+  //   return TRUE;
+  // } else {
+  //   return FALSE;
+  // }
+  return FALSE;
 }
 
 /**
