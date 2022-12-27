@@ -13,7 +13,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = FreedomU540HiFiveUnleashed
+  PLATFORM_NAME                  = NanhuFPGA
   PLATFORM_GUID                  = 8317E90F-428B-403F-9057-112B0C19008E
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001c
@@ -85,6 +85,7 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
+#  SerialPortLib|Platform/Bosc/XiangshanSeriesPkg/Library/SerialIoLib/SerialIoLib.inf
   SerialPortLib|Platform/Bosc/XiangshanSeriesPkg/Library/SerialIoLib/SerialIoLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf

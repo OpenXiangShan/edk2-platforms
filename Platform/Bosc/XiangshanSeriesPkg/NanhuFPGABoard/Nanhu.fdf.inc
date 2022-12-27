@@ -89,19 +89,19 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize = 0x10000
 
 
 SET gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz    = 1000000
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 1000000000 # 1GHz system clock
-SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 1          # Boot hart ID
+SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 25000000 # 25Mhz system clock
+SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 0          # Boot hart ID
 
 #
 # The bootable hart number the platform would like to use during boot.
 #
-SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 4
+SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 1
 #
 # Only use hart ID 1, 2, 3, 4
 #
-SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x1,0x2,0x3,0x4}
+SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x0}
                                                                                     # during boot
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores       = 4          # Total U5 cores enabled on U540 platform
+SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores       = 1          # Total U5 cores enabled on U540 platform
 SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported         = True       # E51 MC exists.
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase            = 0x10010000 # Serial port base address
+SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase            = 0x310B0000 # Serial port base address
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode        = 1          # Set PeiCore to S-Mode
