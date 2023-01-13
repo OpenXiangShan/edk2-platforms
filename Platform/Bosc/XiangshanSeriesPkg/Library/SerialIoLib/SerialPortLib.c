@@ -19,7 +19,7 @@
 #define UART_THR_OFFSET		0	/* Out: Transmitter Holding Register */
 #define UART_DLL_OFFSET		0	/* Out: Divisor Latch Low */
 #define UART_IER_OFFSET		1	/* I/O: Interrupt Enable Register */
-#define UART_DLM_OFFSET		1	/* Out: Divisor Latch High */
+#define UART_DLH_OFFSET		1	/* Out: Divisor Latch High */
 #define UART_FCR_OFFSET		2	/* Out: FIFO Control Register */
 #define UART_IIR_OFFSET		2	/* I/O: Interrupt Identification Register */
 #define UART_LCR_OFFSET		3	/* Out: Line Control Register */
@@ -27,25 +27,34 @@
 #define UART_LSR_OFFSET		5	/* In:  Line Status Register */
 #define UART_MSR_OFFSET		6	/* In:  Modem Status Register */
 #define UART_SCR_OFFSET		7	/* I/O: Scratch Register */
-#define UART_MDR1_OFFSET	8	/* I/O:  Mode Register */
+#define UART_MDR1_OFFSET	8	/* I/O: Mode Register */
+#define UART_USR_OFFSET   31/* I/O: UART Status Register */
 
 #define UART_LSR_FIFOE		0x80	/* Fifo error */
-#define UART_LSR_TEMT		0x40	/* Transmitter empty */
-#define UART_LSR_THRE		0x20	/* Transmit-hold-register empty */
-#define UART_LSR_BI		0x10	/* Break interrupt indicator */
-#define UART_LSR_FE		0x08	/* Frame error indicator */
-#define UART_LSR_PE		0x04	/* Parity error indicator */
-#define UART_LSR_OE		0x02	/* Overrun error indicator */
-#define UART_LSR_DR		0x01	/* Receiver data ready */
+#define UART_LSR_TEMT		  0x40	/* Transmitter empty */
+#define UART_LSR_THRE		  0x20	/* Transmit-hold-register empty */
+#define UART_LSR_BI		    0x10	/* Break interrupt indicator */
+#define UART_LSR_FE		    0x08	/* Frame error indicator */
+#define UART_LSR_PE		    0x04	/* Parity error indicator */
+#define UART_LSR_OE		    0x02	/* Overrun error indicator */
+#define UART_LSR_DR		    0x01	/* Receiver data ready */
 #define UART_LSR_BRK_ERROR_BITS	0x1E	/* BI, FE, PE, OE bits */
 
+#define UART_DATA_TERMINAL_READY        (1 << 0)
+#define UART_REQUEST_TO_SEND            (1 << 1)
+#define UART_LOOPBACK_BIT               (1 << 4)
+#define UART_AUTO_FLOW_CONTROL          (1 << 5)
+
+#define UART_CLEAR_TO_SEND              (1 << 4)
+#define UART_DATA_SET_READY             (1 << 5)
+#define UART_RING_INDICATOR             (1 << 6)
+#define UART_CARRIER_DETECT             (1 << 7)
 
 //---------------------------------------------
 // UART Settings
 //---------------------------------------------
 #define UART_BAUDRATE  9600
 #define SYS_CLK        FixedPcdGet32(PcdU5PlatformSystemClock)
-BOOLEAN Initiated = FALSE;
 
 
 /**
@@ -109,8 +118,8 @@ UINT32 UartGetChar (VOID)
 }
 
 /**
-  buadrate = serial clock freq / ( 16 * divisor )
-  divisor  =  serial clock freq / ( 16 * buadrate )
+  baudrate = serial clock freq / ( 16 * divisor )
+  divisor  =  serial clock freq / ( 16 * baudrate )
   @param Freq         The given clock to UART.
   @param MaxTargetHZ  Target baudrate.
 
@@ -123,6 +132,32 @@ UartMinClkDivisor (
 {
   UINT64 Quotient;
   Quotient = Freq / ( MaxTargetHZ * 16 );
+  return Quotient;
+}
+
+
+/**
+  Wait for the serial port to be idle
+**/
+VOID
+SerialWaitForIdle ()
+{
+  while(GetReg(UART_USR_OFFSET) != 0);
+}
+
+/**
+  Get current CLK Divisor
+**/
+UINT32
+UartCurrentClkDivisor ()
+{
+  UINT32 Quotient;
+  UINT32 LCR;
+  while(GetReg(UART_USR_OFFSET) != 0);
+  LCR = GetReg(UART_LCR_OFFSET);
+  SetReg(UART_LCR_OFFSET, LCR | 0x80);
+  Quotient = GetReg(UART_DLL_OFFSET);
+  SetReg(UART_LCR_OFFSET, LCR);
   return Quotient;
 }
 
@@ -150,11 +185,10 @@ SerialPortInitialize (
   if (Divisor == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  CurrentDivisor = (GetReg(UART_DLL_OFFSET) & 0xff) | ((GetReg(UART_DLM_OFFSET) & 0xff) << 8);
+  CurrentDivisor = UartCurrentClkDivisor();
   if (Divisor != CurrentDivisor) {
     uart8250_init(FixedPcdGet32(PcdU5UartBase), SYS_CLK, UART_BAUDRATE, 2, 4);
   }
-  Initiated = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -186,7 +220,7 @@ SerialPortWrite (
 {
   UINTN Index;
 
-  if (Buffer == NULL || Initiated == FALSE) {
+  if (Buffer == NULL) {
     return 0;
   }
 
@@ -217,7 +251,7 @@ SerialPortRead (
 {
   UINTN Index;
 
-  if (NULL == Buffer || Initiated == FALSE) {
+  if (NULL == Buffer) {
     return 0;
   }
 
@@ -245,18 +279,13 @@ SerialPortPoll (
   VOID
   )
 {
-  // STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
-  // UINT32 IP;
+  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
+  UINT32 IP;
 
-  // if (Initiated == FALSE) {
-  //   return FALSE;
-  // }
-  // IP = MmioRead32 ((UINTN)(uart + UART_REG_IP));
-  // if(IP & UART_IP_RXWM) {
-  //   return TRUE;
-  // } else {
-  //   return FALSE;
-  // }
+  IP = MmioRead32 ((UINTN)(uart + UART_LSR_OFFSET));
+  if (IP & UART_LSR_DR) {
+    return TRUE;
+  }
   return FALSE;
 }
 
@@ -276,9 +305,25 @@ SerialPortSetControl (
   IN UINT32 Control
   )
 {
-  if (Initiated == FALSE) {
-    return EFI_NOT_READY;
+  UINT32 Mcr;
+  if ((Control & (~(EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
+                    EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) != 0)
+  {
+    return RETURN_UNSUPPORTED;
   }
+  Mcr = GetReg(UART_MCR_OFFSET);
+  Mcr &= (~(UART_DATA_TERMINAL_READY | UART_REQUEST_TO_SEND));
+
+  if ((Control & EFI_SERIAL_DATA_TERMINAL_READY) == EFI_SERIAL_DATA_TERMINAL_READY) {
+    Mcr |= UART_DATA_TERMINAL_READY;
+  }
+
+  if ((Control & EFI_SERIAL_REQUEST_TO_SEND) == EFI_SERIAL_REQUEST_TO_SEND) {
+    Mcr |= UART_REQUEST_TO_SEND;
+  }
+
+  SetReg(UART_MCR_OFFSET, Mcr);
+
   return RETURN_SUCCESS;
 }
 
@@ -298,10 +343,44 @@ SerialPortGetControl (
   OUT UINT32 *Control
   )
 {
-  if (Initiated == FALSE) {
-    return EFI_NOT_READY;
+  UINT32 Mcr;
+  UINT32 Msr;
+  UINT32 Lsr;
+  Mcr = GetReg(UART_MCR_OFFSET);
+  if ((Mcr & UART_LOOPBACK_BIT) == UART_LOOPBACK_BIT){
+    *Control |= EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE;
   }
-  *Control = 0;
+  if ((Mcr & UART_AUTO_FLOW_CONTROL) == UART_AUTO_FLOW_CONTROL) {
+    *Control |= EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+  }
+  if ((Mcr & UART_REQUEST_TO_SEND) == UART_REQUEST_TO_SEND) {
+    *Control |= EFI_SERIAL_REQUEST_TO_SEND;
+  }
+  if ((Mcr & UART_DATA_TERMINAL_READY) == UART_DATA_TERMINAL_READY) {
+    *Control |= EFI_SERIAL_DATA_TERMINAL_READY;
+  }
+
+  Msr = GetReg(UART_MSR_OFFSET);
+  if ((Msr & UART_CLEAR_TO_SEND) == UART_CLEAR_TO_SEND) {
+    *Control |= EFI_SERIAL_CLEAR_TO_SEND;
+  }
+  if ((Msr & UART_DATA_SET_READY) == UART_DATA_SET_READY) {
+    *Control |= EFI_SERIAL_DATA_SET_READY;
+  }
+  if ((Msr & UART_RING_INDICATOR) == UART_RING_INDICATOR) {
+    *Control |= EFI_SERIAL_RING_INDICATE;
+  }
+  if ((Msr & UART_CARRIER_DETECT) == UART_CARRIER_DETECT) {
+    *Control |= EFI_SERIAL_CARRIER_DETECT;
+  }
+
+  Lsr = GetReg(UART_LSR_OFFSET);
+  if ((Lsr & (UART_LSR_TEMT | UART_LSR_THRE)) == (UART_LSR_TEMT | UART_LSR_THRE)) {
+    *Control |= EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  }
+  if ((Lsr & UART_LSR_DR) == 0) {
+    *Control |= EFI_SERIAL_INPUT_BUFFER_EMPTY;
+  }
   return RETURN_SUCCESS;
 }
 
@@ -349,8 +428,80 @@ SerialPortSetAttributes (
   IN OUT EFI_STOP_BITS_TYPE *StopBits
   )
 {
-  if (Initiated == FALSE) {
-    return EFI_NOT_READY;
+  UINT32  SerialBaudRate;
+  UINTN   Divisor;
+  UINT8   Lcr;
+  UINT8   LcrData;
+  UINT8   LcrParity;
+  UINT8   LcrStop;
+
+  if (*BaudRate == 0) {
+    *BaudRate = UART_BAUDRATE;
   }
+
+  SerialBaudRate = *BaudRate;
+
+  if (*DataBits == 0) {
+    LcrData = 0x3;
+    *DataBits = LcrData + 5;
+  } else {
+    if ((*DataBits < 5) || (*DataBits > 8)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    LcrData = (UINT8)(*DataBits - (UINT8)5);
+  }
+
+  if (*Parity == DefaultParity) {
+    LcrParity = 0;
+    *Parity = NoParity;
+  } else {
+    switch (*Parity) {
+      case NoParity:
+        LcrParity = 0;
+        break;
+      case EvenParity:
+        LcrParity = 3;
+        break;
+      case OddParity:
+        LcrParity = 1;
+        break;
+      case SpaceParity:
+        LcrParity = 7;
+        break;
+      case MarkParity:
+        LcrParity = 5;
+        break;
+      default:
+        return RETURN_INVALID_PARAMETER;
+    }
+  }
+
+  if (*StopBits == DefaultStopBits) {
+    LcrStop = 0;
+    *StopBits = OneStopBit;
+  } else {
+    switch (*StopBits) {
+      case OneStopBit:
+        LcrStop = 0;
+        break;
+      case OneFiveStopBits:
+      case TwoStopBits:
+        LcrStop = 1;
+        break;
+      default:
+        return RETURN_INVALID_PARAMETER;
+    }
+  }
+
+  Divisor = SYS_CLK / (SerialBaudRate * 16);
+  // Set Baudrate
+  SetReg(UART_LCR_OFFSET,0x80);
+  SetReg(UART_DLH_OFFSET, (UINT8)(Divisor >> 8));
+  SetReg(UART_DLL_OFFSET, (UINT8)(Divisor & 0xFF));
+
+  // Set 
+  Lcr = (UINT8)((LcrParity << 3) | (LcrStop << 2) | LcrData);
+  SetReg(UART_LCR_OFFSET, Lcr & 0x3F);
+
   return RETURN_SUCCESS;
 }
