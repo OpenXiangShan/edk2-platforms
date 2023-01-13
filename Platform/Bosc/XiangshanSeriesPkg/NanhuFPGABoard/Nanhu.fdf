@@ -1,12 +1,10 @@
 # @file
-#  Flash definition file on SiFive Freedom U540 HiFive Unleashed RISC-V platform
+# Flash definition file on NanhuFPGA RISC-V platform
 #
-#  Copyright (c) 2019-2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2022, BOSC. All rights reserved.
 #
-#  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-# Platform definitions
-#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
 !include Nanhu.fdf.inc
 
 #
@@ -33,7 +31,14 @@ gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase|gUefiRiscVPlatformPkgToken
 FV = FVMAIN_COMPACT
 
 !include VarStore.fdf.inc
-!include DeviceTree.fdf.inc
+
+$(DTB_OFFSET)|$(DTB_SIZE)
+FILE=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/$(ARCH)/Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/NanhuDeviceTree/OUTPUT/Nanhu.dtb
+
+
+0x00842000|0x1000
+gUefiRiscVPlatformPkgTokenSpaceGuid.PcdDeviceTreeAddress
+DATA = { 0x00, 0x00, 0x84, 0x80, 0x00, 0x00, 0x00, 0x00 } #Must be consistent with $(DTB_OFFSET)
 
 ################################################################################
 
@@ -235,7 +240,7 @@ READ_ENABLED_CAP   = TRUE
 READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
-FvNameGuid         = 27A72E80-3118-4c0c-8673-AA5B4EFA9613
+FvNameGuid         = 3D6404C0-9303-11ED-BFDA-00155D96A1C8
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
