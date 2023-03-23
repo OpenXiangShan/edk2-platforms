@@ -12,7 +12,7 @@
     L18: soc {
         L2: clint@38000000 {
             compatible = "riscv,clint0";
-            interrupts-extended = <&L4 3 &L4 7>;
+            interrupts-extended = <&L4 3 &L4 7 &L5 3 &L5 7>;
             reg = <0x0 0x38000000 0x0 0x10000>;
             reg-names = "control";
             clock-frequency-mhz = <50>;
