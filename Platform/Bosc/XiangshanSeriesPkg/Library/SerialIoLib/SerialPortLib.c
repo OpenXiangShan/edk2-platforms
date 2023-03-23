@@ -53,7 +53,7 @@
 //---------------------------------------------
 // UART Settings
 //---------------------------------------------
-#define UART_BAUDRATE  9600
+#define UART_BAUDRATE  115200
 #define SYS_CLK        FixedPcdGet32(PcdU5PlatformSystemClock)
 
 
