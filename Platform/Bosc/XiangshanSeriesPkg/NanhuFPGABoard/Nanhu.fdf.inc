@@ -10,8 +10,8 @@
 DEFINE BLOCK_SIZE        = 0x1000
 
 DEFINE FW_BASE_ADDRESS   = 0x80000000
-DEFINE FW_SIZE           = 0x00900000
-DEFINE FW_BLOCKS         = 0x900
+DEFINE FW_SIZE           = 0x04000000
+DEFINE FW_BLOCKS         = 0x4000
 
 #
 # 0x000000-0x7DFFFF code
@@ -57,15 +57,26 @@ DEFINE VARS_FTW_SPARE_SIZE           = 0x00018000
 #
 # Device Tree memory region
 #
-DEFINE DTB_OFFSET                    = 0x00840000
-DEFINE DTB_SIZE                      = 0x00002000
+DEFINE DTB_OFFSET                    = 0x03a00000
+DEFINE DTB_SIZE                      = 0x00003000
+
+#
+# Device Tree Address memory region
+#
+DEFINE DTB_ADDRESS_OFFSET            = 0x00843000
+DEFINE DTB_ADDRESS_SIZE              = 0x1000
+
+#
+# Kernel memory Region
+#
+DEFINE KERNEL_OFFSET                 = 0x00a00000
+DEFINE KERNEL_SIZE                   = 0x1e00000
 
 #
 # Scratch area memory region
 #
 DEFINE SCRATCH_OFFSET                = 0x00880000
 DEFINE SCRATCH_SIZE                  = 0x00010000
-
 
 DEFINE FW_DOMAIN_SIZE    = $(FVMAIN_OFFSET) + $(FVMAIN_SIZE) - $(PEIFV_OFFSET)
 DEFINE VARIABLE_FW_SIZE  = $(VARS_FTW_SPARE_OFFSET) + $(VARS_FTW_SPARE_SIZE) - $(VARS_OFFSET)
@@ -87,21 +98,21 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamSize   = $(SCRATCH_SIZE)
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase = $(CODE_BASE_ADDRESS) + $(FW_SIZE)
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize = 0x10000
 
-
 SET gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz    = 500000
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 50000000 # 50Mhz system clock
+SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 50000000   # 50Mhz system clock
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 0          # Boot hart ID
+SET gEfiDemoLoaderProtocolGuid.PcdBootHartId                           = 0          # use for Loader, must be the same as gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
 
 #
 # The bootable hart number the platform would like to use during boot.
 #
-SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 1
+SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 2
 #
-# Only use hart ID 1, 2, 3, 4
+# Only use hart ID 0, 1
 #
-SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x0}
+SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x0, 0x1}
                                                                                     # during boot
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores       = 1          # Total U5 cores enabled on U540 platform
+#SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores       = 1          # Total U5 cores enabled on U540 platform
 SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported         = True       # E51 MC exists.
 SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase            = 0x310B0000 # Serial port base address
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode        = 1          # Set PeiCore to S-Mode

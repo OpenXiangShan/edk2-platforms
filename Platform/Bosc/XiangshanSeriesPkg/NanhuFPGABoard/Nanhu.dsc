@@ -570,3 +570,4 @@
 !endif
 
   MdeModulePkg/Application/UiApp/UiApp.inf
+  Loader/Loader.inf

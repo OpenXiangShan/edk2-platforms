@@ -32,13 +32,17 @@ FV = FVMAIN_COMPACT
 
 !include VarStore.fdf.inc
 
-$(DTB_OFFSET)|$(DTB_SIZE)
-FILE=$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/$(ARCH)/Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/NanhuDeviceTree/OUTPUT/Nanhu.dtb
-
-
-0x00842000|0x1000
+$(DTB_ADDRESS_OFFSET)|$(DTB_ADDRESS_SIZE)
 gUefiRiscVPlatformPkgTokenSpaceGuid.PcdDeviceTreeAddress
-DATA = { 0x00, 0x00, 0x84, 0x80, 0x00, 0x00, 0x00, 0x00 } #Must be consistent with $(DTB_OFFSET)
+DATA = { 0x00, 0x00, 0xa0, 0x83, 0x00, 0x00, 0x00, 0x00 } #Must be consistent with $(DTB_OFFSET)
+
+$(KERNEL_OFFSET)|$(KERNEL_SIZE)
+gEfiDemoLoaderProtocolGuid.PcdKernelBase|gEfiDemoLoaderProtocolGuid.PcdKernelSize
+FILE = edk2-platforms/Loader/Image
+
+$(DTB_OFFSET)|$(DTB_SIZE)
+gEfiDemoLoaderProtocolGuid.PcdDTBBase|gEfiDemoLoaderProtocolGuid.PcdDTBSize
+FILE = edk2-platforms/Loader/dump.dtb
 
 ################################################################################
 
@@ -197,6 +201,7 @@ INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
 INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
+INF  Loader/Loader.inf
 
 #
 # Network modules
