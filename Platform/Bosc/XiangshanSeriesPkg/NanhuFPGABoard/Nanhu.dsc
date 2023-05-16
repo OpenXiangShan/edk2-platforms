@@ -570,4 +570,4 @@
 !endif
 
   MdeModulePkg/Application/UiApp/UiApp.inf
-  Loader/Loader.inf
+  Silicon/Bosc/Nanhu/Loader/Loader.inf

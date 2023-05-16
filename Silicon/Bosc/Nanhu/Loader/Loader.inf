@@ -10,7 +10,7 @@
   Loader.c
 
 [Packages]
-  Loader/Loader.dec
+  Silicon/Bosc/Nanhu/Loader/Loader.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
  
