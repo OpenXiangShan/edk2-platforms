@@ -210,8 +210,8 @@ PlatformBootManagerBeforeConsole (
   //
   // Register UEFI Shell
   //
-  PlatformRegisterFvBootOption (&mLoaderGuid, L"Loader", LOAD_OPTION_ACTIVE);
   PlatformRegisterFvBootOption (&mUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  PlatformRegisterFvBootOption (&mLoaderGuid, L"Loader", LOAD_OPTION_ACTIVE);
 }
 
 /**

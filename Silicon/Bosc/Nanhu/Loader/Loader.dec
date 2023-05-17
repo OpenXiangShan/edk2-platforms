@@ -8,8 +8,3 @@
   gEfiDemoLoaderProtocolGuid = { 0xe7e1efa6, 0x7607, 0x3a78, { 0xc7, 0xdd, 0x43, 0xe4, 0xbd, 0x72, 0xc1, 0x19 }}
 
 [PcdsFixedAtBuild]
-  gEfiDemoLoaderProtocolGuid.PcdKernelBase|0|UINT64|0x40000001
-  gEfiDemoLoaderProtocolGuid.PcdKernelSize|0|UINT64|0x40000002
-  gEfiDemoLoaderProtocolGuid.PcdDTBBase|0|UINT64|0x40000003
-  gEfiDemoLoaderProtocolGuid.PcdDTBSize|0|UINT64|0x40000004
-  gEfiDemoLoaderProtocolGuid.PcdBootHartId|0|UINT64|0x40000005

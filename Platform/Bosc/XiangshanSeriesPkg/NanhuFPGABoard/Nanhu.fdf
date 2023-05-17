@@ -37,11 +37,11 @@ gUefiRiscVPlatformPkgTokenSpaceGuid.PcdDeviceTreeAddress
 DATA = { 0x00, 0x00, 0xa0, 0x83, 0x00, 0x00, 0x00, 0x00 } #Must be consistent with $(DTB_OFFSET)
 
 $(KERNEL_OFFSET)|$(KERNEL_SIZE)
-gEfiDemoLoaderProtocolGuid.PcdKernelBase|gEfiDemoLoaderProtocolGuid.PcdKernelSize
+gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
 FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/Image
 
 $(DTB_OFFSET)|$(DTB_SIZE)
-gEfiDemoLoaderProtocolGuid.PcdDTBBase|gEfiDemoLoaderProtocolGuid.PcdDTBSize
+gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
 FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/dump.dtb
 
 ################################################################################

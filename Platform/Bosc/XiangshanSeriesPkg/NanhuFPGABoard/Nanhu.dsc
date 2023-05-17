@@ -530,6 +530,11 @@
   Silicon/RISC-V/ProcessorPkg/Universal/FdtDxe/FdtDxe.inf
 
   #
+  # Nanhu Loader
+  #
+  Silicon/Bosc/Nanhu/Loader/Loader.inf
+  
+  #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
   FatPkg/EnhancedFatDxe/Fat.inf
@@ -553,6 +558,7 @@
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+      NULL|Silicon/Bosc/Nanhu/Application/LoaderTool/LoaderTool.inf
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
       FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
       SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
@@ -570,4 +576,3 @@
 !endif
 
   MdeModulePkg/Application/UiApp/UiApp.inf
-  Silicon/Bosc/Nanhu/Loader/Loader.inf

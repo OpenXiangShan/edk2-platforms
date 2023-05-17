@@ -101,7 +101,7 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize = 0x10000
 SET gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz    = 500000
 SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 50000000   # 50Mhz system clock
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 0          # Boot hart ID
-SET gEfiDemoLoaderProtocolGuid.PcdBootHartId                           = 0          # use for Loader, must be the same as gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
+SET gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId                           = 0          # use for Loader, must be the same as gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
 
 #
 # The bootable hart number the platform would like to use during boot.

@@ -10,7 +10,7 @@
   Loader.c
 
 [Packages]
-  Silicon/Bosc/Nanhu/Loader/Loader.dec
+  Silicon/Bosc/Bosc.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
  
@@ -23,9 +23,12 @@
   UefiApplicationEntryPoint
   PeCoffGetEntryPointLib
 
-[FixedPcd]
-  gEfiDemoLoaderProtocolGuid.PcdKernelBase
-  gEfiDemoLoaderProtocolGuid.PcdKernelSize
-  gEfiDemoLoaderProtocolGuid.PcdDTBBase
-  gEfiDemoLoaderProtocolGuid.PcdDTBSize
-  gEfiDemoLoaderProtocolGuid.PcdBootHartId
+[Guids]
+  gEfiBoscSiliconTokenSpaceGuid
+
+[pcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId
