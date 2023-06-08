@@ -1,0 +1,32 @@
+[Defines]
+ INF_VERSION         = 0x00010006
+ BASE_NAME           = LinuxLoader
+ FILE_GUID           = 67F6CDC9-8FD2-4198-A649-F3099139D591
+ MODULE_TYPE         = UEFI_APPLICATION
+ VERSION_STRING      = 1.0
+ ENTRY_POINT         = UefiMain
+
+[Sources]
+  LinuxLoader.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Bosc/Bosc.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+
+[GUIDS]
+  gEfiBoscSiliconTokenSpaceGuid
+
+[Protocols]
+
+[pcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId
+

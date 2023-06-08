@@ -548,6 +548,11 @@
   Silicon/Bosc/Nanhu/Loader/Loader.inf
 
   #
+  # Linux Lodaer
+  #
+  Silicon/Bosc/Nanhu/Application/LinuxLoader/LinuxLoader.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
   FatPkg/EnhancedFatDxe/Fat.inf
