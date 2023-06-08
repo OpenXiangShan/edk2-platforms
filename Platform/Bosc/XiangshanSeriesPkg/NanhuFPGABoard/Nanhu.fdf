@@ -225,6 +225,12 @@ INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
 
+#
+# Mmc Host Support
+#
+INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
+INF Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]

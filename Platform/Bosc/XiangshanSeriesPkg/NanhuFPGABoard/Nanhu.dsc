@@ -364,7 +364,6 @@
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
-
 [PcdsDynamicDefault]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
@@ -382,6 +381,14 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
+
+################################################################################
+#
+# Pcd Section - list of all EDK II PCD Entries defined by this Platform
+#
+################################################################################
+[PcdsFixedAtBuild.common]
+  gEfiBoscSiliconTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x30050000
 
 ################################################################################
 #
@@ -530,10 +537,16 @@
   Silicon/RISC-V/ProcessorPkg/Universal/FdtDxe/FdtDxe.inf
 
   #
+  # Mmc host support
+  #
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
+  Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+
+  #
   # Nanhu Loader
   #
   Silicon/Bosc/Nanhu/Loader/Loader.inf
-  
+
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
