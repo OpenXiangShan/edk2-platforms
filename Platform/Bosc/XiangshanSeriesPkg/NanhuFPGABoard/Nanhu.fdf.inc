@@ -1,11 +1,3 @@
-## @file
-#  Definitions of Flash definition file on SiFive Freedom U540 HiFive Unleashed RISC-V platform
-#
-#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
-#
-#  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-##
 [Defines]
 DEFINE BLOCK_SIZE        = 0x1000
 
@@ -99,7 +91,7 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase = $(CODE_BASE_ADDRES
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize = 0x10000
 
 SET gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz    = 500000
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock = 50000000   # 50Mhz system clock
+SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock = 50000000   # 50Mhz system clock
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 0          # Boot hart ID
 SET gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId                           = 0          # use for Loader, must be the same as gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
 
@@ -112,7 +104,6 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 2
 #
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x0, 0x1}
                                                                                     # during boot
-#SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores       = 1          # Total U5 cores enabled on U540 platform
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported         = True       # E51 MC exists.
-SET gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase            = 0x310B0000 # Serial port base address
+#SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdNumberofCores       = 1          # Total cores enabled
+SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase            = 0x310B0000 # Serial port base address
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode        = 1          # Set PeiCore to S-Mode

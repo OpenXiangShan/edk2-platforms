@@ -32,8 +32,8 @@
   RiscVOpensbiLib
 
 [FixedPcd]
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock
+  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase
+  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock
 
 [Sources]
   SerialPortLib.c

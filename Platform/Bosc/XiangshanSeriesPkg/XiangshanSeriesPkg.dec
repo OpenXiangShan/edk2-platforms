@@ -11,7 +11,7 @@
   DEC_SPECIFICATION              = 0x0001001b
   PACKAGE_NAME                   = XiangshanSeriesPkg
   PACKAGE_UNI_FILE               = XiangshanSeriesPkg.uni
-  PACKAGE_GUID                   = 9c07e68c-011b-4acb-9195-55453997427b
+  PACKAGE_GUID                   = 6b656c03-7da8-4c7f-9859-b07a680e78f7
   PACKAGE_VERSION                = 1.0
 
 [Includes]
@@ -20,15 +20,14 @@
 [LibraryClasses]
 
 [Guids]
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid  = {0x12115609, 0x4da5, 0x41cb, { 0x9c, 0x27, 0x74, 0xa1, 0x8e, 0x59, 0x69, 0xd0 }}
+  gBoscNanhuPlatformsPkgTokenSpaceGuid  = {0x12115609, 0x4da5, 0x41cb, { 0x9c, 0x27, 0x74, 0xa1, 0x8e, 0x59, 0x69, 0xd0 }}
 
 [PcdsFixedAtBuild]
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock|0x0|UINT32|0x00001000
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores|0x8|UINT32|0x00001001
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported|TRUE|BOOLEAN|0x00001002
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase|0x0|UINT32|0x00001003
+  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock|0x0|UINT32|0x00001000
+  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdNumberofCores|0x8|UINT32|0x00001001
+  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase|0x0|UINT32|0x00001003
 
 [PcdsPatchableInModule]
 
 [UserExtensions.TianoCore."ExtraFiles"]
-  U5SeriesPkg.uni
+  XiangshanSeriesPkg.uni

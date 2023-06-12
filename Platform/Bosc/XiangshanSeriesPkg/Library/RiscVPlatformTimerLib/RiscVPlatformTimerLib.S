@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// SiFive U5 Series Timer CSR functions.
+// Bosc Nanhu Timer CSR functions.
 //
 // Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 //
@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 #include <Base.h>
 #include <RiscVImpl.h>
-#include <U5Clint.h>
+#include <BoscClint.h>
 
 .data
 

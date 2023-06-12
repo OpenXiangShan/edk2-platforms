@@ -54,7 +54,7 @@
 // UART Settings
 //---------------------------------------------
 #define UART_BAUDRATE  115200
-#define SYS_CLK        FixedPcdGet32(PcdU5PlatformSystemClock)
+#define SYS_CLK        FixedPcdGet32(PcdPlatformSystemClock)
 
 
 /**
@@ -69,7 +69,7 @@ UINT32 GetReg (
   IN UINT32 RegIndex
   )
 {
-  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
+  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdUartBase);
   return readl ((volatile void *)(uart + RegIndex));
 }
 
@@ -85,7 +85,7 @@ VOID SetReg (
   IN UINT32 Value
   )
 {
-  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
+  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdUartBase);
   writel (Value, (volatile void *)(uart + RegIndex));
 }
 
@@ -187,7 +187,7 @@ SerialPortInitialize (
   }
   CurrentDivisor = UartCurrentClkDivisor();
   if (Divisor != CurrentDivisor) {
-    uart8250_init(FixedPcdGet32(PcdU5UartBase), SYS_CLK, UART_BAUDRATE, 2, 4);
+    uart8250_init(FixedPcdGet32(PcdUartBase), SYS_CLK, UART_BAUDRATE, 2, 4);
   }
   return EFI_SUCCESS;
 }
@@ -279,7 +279,7 @@ SerialPortPoll (
   VOID
   )
 {
-  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdU5UartBase);
+  STATIC volatile UINT32 * const uart = (UINT32 *)FixedPcdGet32(PcdUartBase);
   UINT32 IP;
 
   IP = MmioRead32 ((UINTN)(uart + UART_LSR_OFFSET));

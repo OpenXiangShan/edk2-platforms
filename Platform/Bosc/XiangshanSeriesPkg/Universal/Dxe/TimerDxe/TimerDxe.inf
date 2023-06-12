@@ -1,5 +1,5 @@
 ## @file
-# RISC-V Timer Arch protocol module for U5 Series platform
+# RISC-V Timer Arch protocol module for XiangShan Series platform
 #
 # Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
@@ -11,7 +11,7 @@
   INF_VERSION                    = 0x0001001b
   BASE_NAME                      = Timer
   MODULE_UNI_FILE                = Timer.uni
-  FILE_GUID                      = 3F75D495-23FF-46B6-9D19-0DECC8A4EA91
+  FILE_GUID                      = D60A57A3-3886-4AE2-BAE1-0D02B575AB2D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = TimerDriverInitialize

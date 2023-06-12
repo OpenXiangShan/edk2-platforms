@@ -1,5 +1,5 @@
 /** @file
-  RISC-V Timer Architectural Protocol for U5 series platform.
+  RISC-V Timer Architectural Protocol for XiangShan Series platform.
 
   Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
@@ -13,7 +13,7 @@
 #include <sbi/riscv_encoding.h>
 #include <sbi/riscv_io.h>
 #include <sbi/riscv_atomic.h>
-#include <U5Clint.h>
+#include <BoscClint.h>
 
 BOOLEAN TimerHandlerReentry = FALSE;
 
@@ -49,7 +49,7 @@ STATIC EFI_TIMER_NOTIFY mTimerNotifyFunction;
 STATIC UINT64 mTimerPeriod = 0;
 
 /**
-  U5 Series Timer Interrupt Handler.
+  XiangShan Series Timer Interrupt Handler.
 
   @param InterruptType    The type of interrupt that occured
   @param SystemContext    A pointer to the system context when the interrupt occured

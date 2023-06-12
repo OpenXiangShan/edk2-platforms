@@ -1,5 +1,5 @@
 ## @file
-#  RISC-V EFI on SiFive Freedom U540 HiFive Unleashed RISC-V platform
+#  RISC-V EFI on Bosc Nanhu RISC-V platform
 #
 #  Copyright (c) 2019-2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
@@ -227,8 +227,7 @@
 #
 # RISC-V core libraries
 #
-  SiliconSiFiveU54CoreInfoLib|Silicon/Bosc/Nanhu/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
-  RiscVCoreplexInfoLib|Platform/Bosc/XiangshanSeriesPkg/Library/PeiCoreInfoHobLib/PeiCoreInfoHobLib.inf
+  RiscVCoreplexInfoLib|Platform/RISC-V/PlatformPkg/Library/PeiCoreInfoHobLibNull/PeiCoreInfoHobLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   TimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVTimerLib/BaseRiscVTimerLib.inf

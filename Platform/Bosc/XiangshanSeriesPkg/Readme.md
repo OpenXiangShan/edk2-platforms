@@ -17,7 +17,7 @@ on S2C FPGA board.
 build -a RISCV64 -t GCC5 -p Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Nanhu.dsc
 ```
 
-## U5SeriesPkg Libraries and Drivers
+## XiangShanSeriesPkg Libraries and Drivers
 ### PeiCoreInfoHobLib
 This is the library to create RISC-V core characteristics for building up RISC-V
 related SMBIOS records to support a single boot loader  or OS image on all RISC-V
@@ -65,9 +65,9 @@ phase for Nanhu FPGA platform initialization.
 
 | **PCD name** |**Usage**|
 |----------------|----------|
-|PcdU5PlatformSystemClock| Xiangshan series platform system clock|
-|PcdNumberofU5Cores| Number of CPU core enabled on Xiangshan series platform|
-|PcdU5UartBase|Platform serial port base address|
+|PcdPlatformSystemClock| Xiangshan series platform system clock|
+|PcdNumberofCores| Number of CPU core enabled on Xiangshan series platform|
+|PcdUartBase|Platform serial port base address|
 
 
 ## Platform Owners

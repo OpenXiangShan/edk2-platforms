@@ -1,5 +1,5 @@
 /** @file
-  RISC-V Timer Architectural Protocol definitions for U5 Series platform,
+  RISC-V Timer Architectural Protocol definitions for XiangShan Series platform,
 
   Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef U5_SERIES_TIMER_H_
-#define U5_SERIES_TIMER_H_
+#ifndef BOSC_TIMER_H_
+#define BOSC_TIMER_H_
 
 #include <PiDxe.h>
 
