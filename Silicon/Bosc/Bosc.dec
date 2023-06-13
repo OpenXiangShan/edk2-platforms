@@ -1,0 +1,41 @@
+## @file
+#  Bosc silicon package definitions
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = BoscSiliconPkg
+  PACKAGE_GUID                   = e3ab8835-7e42-4dea-832b-e97b67503c2a
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+
+[LibraryClasses]
+
+[Guids]
+  gEfiBoscSiliconTokenSpaceGuid  = { 0x15F6AAC3, 0x846F, 0x4709, { 0x81, 0x74, 0x85, 0xca, 0x01, 0x8d, 0xb7, 0x22 }}
+  gShellLoaderToolHiiGuid = { 0xE3686C84, 0xA70B, 0x4E75, { 0x91, 0x79, 0x7B, 0x17, 0x7A, 0x2B, 0x2F, 0x5A } }
+  gShellDumpBlockHiiGuid = { 0x4C02FF86, 0x1CDA, 0x4140, { 0x92, 0x5A, 0xB8, 0xF1, 0xBD, 0xFF, 0x80, 0x62 }}
+
+[Protocols]
+
+[PcdsFixedAtBuild]
+  #Bosc Payload loader info
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|0|UINT64|0x40000001
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize|0|UINT64|0x40000002
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|0|UINT64|0x40000003
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize|0|UINT64|0x40000004
+  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId|0|UINT64|0x40000005
+
+  #Mmc host controller
+  gEfiBoscSiliconTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000010
+
+[PcdsDynamic, PcdsDynamicEx]
+
+[PcdsFeatureFlag]
+

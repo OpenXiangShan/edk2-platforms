@@ -14,6 +14,10 @@ EFI_GUID  mUefiShellFileGuid = {
   0x7C04A583, 0x9E3E, 0x4f1c, { 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 };
 
+EFI_GUID mLoaderGuid = {
+  0x1134E1F2, 0x6EF6, 0x11ED, { 0x9D, 0x12, 0x00, 0x15, 0x5D, 0x1D, 0x93, 0xB4 }
+};
+
 /**
   Perform the platform diagnostic, such like test memory. OEM/IBV also
   can customize this function to support specific platform diagnostic.
@@ -207,6 +211,7 @@ PlatformBootManagerBeforeConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (&mUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  PlatformRegisterFvBootOption (&mLoaderGuid, L"Loader", LOAD_OPTION_ACTIVE);
 }
 
 /**

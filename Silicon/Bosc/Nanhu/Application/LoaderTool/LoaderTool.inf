@@ -1,0 +1,45 @@
+[Defines]
+  INF_VERSION = 0x00010006
+  BASE_NAME = UefiShellLoaderToolLib
+  FILE_GUID = D4E1CA4F-236C-4C65-9F3F-A5CE5FB3B319
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR = ShellBoscLoaderToolLibConstructor
+  DESTRUCTOR  = ShellBoscLoaderToolLibDestructor
+
+[Sources]
+  LoaderTool.c
+  LoaderTool.uni
+
+[Packages]
+  Silicon/Bosc/Bosc.dec
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  PcdLib
+
+[Guids]
+  gEfiBoscSiliconTokenSpaceGuid
+
+[pcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
+  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId
+
+[Guids]
+  gShellLoaderToolHiiGuid

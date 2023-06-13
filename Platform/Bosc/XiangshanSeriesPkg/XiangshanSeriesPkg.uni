@@ -1,0 +1,12 @@
+## @file
+# Bosc Xiangshan Series Package Localized Strings and Content.
+#
+#  Copyright (c) 2022, BOSC. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "Provides Bosc RISC-V Xiangshan series platform modules and libraries"
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "This Package Bosc RISC-V Xiangshan series platform modules and libraries."
