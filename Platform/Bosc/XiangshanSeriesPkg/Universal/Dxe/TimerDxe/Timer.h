@@ -22,10 +22,11 @@
 #include <Library/RiscVCpuLib.h>
 
 //
-// RISC-V use 100us timer.
 // The default timer tick duration is set to 10 ms = 10 * 1000 * 10 100 ns units
+// NanHuFpga clint Freq is 500 000,so 1 ticks is 2us(1s/500 000)
+// Dispatch every 10ms, Tick number 5000
 //
-#define DEFAULT_TIMER_TICK_DURATION 100000
+#define DEFAULT_TIMER_TICK_DURATION 5000
 
 extern VOID RiscvSetTimerPeriod (UINT32 TimerPeriod);
 
