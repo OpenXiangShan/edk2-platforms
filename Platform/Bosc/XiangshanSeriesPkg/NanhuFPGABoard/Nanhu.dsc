@@ -103,6 +103,7 @@
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+  AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
 
 # RISC-V Platform Library
   TimeBaseLib|EmbeddedPkg//Library/TimeBaseLib/TimeBaseLib.inf
@@ -551,6 +552,12 @@
   #
   Silicon/Bosc/Nanhu/Application/LinuxLoader/LinuxLoader.inf
 
+  #
+  # Acpi Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/AcpiTables/AcpiTables.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #

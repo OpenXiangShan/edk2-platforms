@@ -1,0 +1,65 @@
+/** @file
+*  Multiple APIC Description Table (MADT)
+*
+*  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+*  Copyright (c) 2012 - 2016, ARM Limited. All rights reserved.
+*  Copyright (c) 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#include "AcpiHeader.h"
+
+//
+// Multiple APIC Description Table
+//
+#pragma pack (1)
+
+typedef struct {
+  UINT8 Type;
+  UINT8 Length;
+  UINT8 Version;
+  UINT8 Reserved;
+  UINT32 Flags;
+  UINT64 HartId;
+  UINT32 Uid;
+} EFI_ACPI_INTC_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_INTC_STRUCTURE intc[2];
+} EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    ACPI_HEADER (
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    //
+    // MADT specific fields
+    //
+    0, // LocalApicAddress
+    0, // Flags
+  },
+  {
+    EFI_ACPI_INTC_INIT (0, 0),
+    EFI_ACPI_INTC_INIT (1, 1),
+  }
+
+  //EFI_ACPI_INTC_INIT (0, 0),
+};
+
+//
+// Reference the table being generated to prevent the optimizer
+// from removing the data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Madt;
