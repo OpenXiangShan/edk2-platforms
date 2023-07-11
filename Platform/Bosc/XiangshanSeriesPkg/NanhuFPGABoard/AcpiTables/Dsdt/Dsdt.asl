@@ -12,6 +12,6 @@ DefinitionBlock ("DsdtTable.aml", "DSDT",
                  EFI_ACPI_6_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_REVISION,
                  "BOSC  ", "NANHU  ", FixedPcdGet32 (PcdAcpiDefaultOemRevision)) {
   Scope (_SB) {
-
+    include ("sd.asl")
   } // Scope (_SB)
 }
