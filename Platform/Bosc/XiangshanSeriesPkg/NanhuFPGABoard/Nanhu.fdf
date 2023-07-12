@@ -231,6 +231,10 @@ INF  MdeModulePkg/Application/UiApp/UiApp.inf
 INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
 INF Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
+# GMAC Support
+INF  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/DwEmacSnpDxe/DwEmacSnpDxe.inf
+
 #
 # ACPI
 #

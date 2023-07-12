@@ -145,6 +145,9 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
+  DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
+  NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
+
 [LibraryClasses.common]
 !if $(SECURE_BOOT_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -601,3 +604,6 @@
 !endif
 
   MdeModulePkg/Application/UiApp/UiApp.inf
+
+  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/DwEmacSnpDxe/DwEmacSnpDxe.inf
