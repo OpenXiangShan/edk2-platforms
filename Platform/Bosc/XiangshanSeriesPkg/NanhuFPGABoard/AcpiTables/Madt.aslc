@@ -23,6 +23,17 @@
 typedef struct {
   UINT8 Type;
   UINT8 Length;
+  UINT8 Enable;
+  UINT8 MaxPriority;
+  UINT16 NumberOfDev;
+  UINT32 BaseAddress;
+  UINT32 MmioSize;
+  UINT16 NumberOfHart;
+} EFI_ACPI_PLIC_STRUCTURE;
+
+typedef struct {
+  UINT8 Type;
+  UINT8 Length;
   UINT8 Version;
   UINT8 Reserved;
   UINT32 Flags;
@@ -32,7 +43,8 @@ typedef struct {
 
 typedef struct {
   EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
-  EFI_ACPI_INTC_STRUCTURE intc[2];
+  EFI_ACPI_INTC_STRUCTURE Intc[2];
+  EFI_ACPI_PLIC_STRUCTURE Plic;
 } EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
 #pragma pack ()
@@ -53,9 +65,17 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
   {
     EFI_ACPI_INTC_INIT (0, 0),
     EFI_ACPI_INTC_INIT (1, 1),
+  },
+  {
+    0x19,                              /* UINT8   Type */
+    sizeof(EFI_ACPI_PLIC_STRUCTURE),   /* UINT8   Length */
+    1,                                 /* UINT8   Enable */
+    7,                                 /* UINT8   MaxPriority */
+    64,                                /* UINT16  NumberOfDev */
+    0x3c000000,                        /* UINT32  BaseAddress */
+    0x4000000,                         /* UINT32  MmioSize */
+    2                                  /* UINT16  NumberOfHart */
   }
-
-  //EFI_ACPI_INTC_INIT (0, 0),
 };
 
 //
