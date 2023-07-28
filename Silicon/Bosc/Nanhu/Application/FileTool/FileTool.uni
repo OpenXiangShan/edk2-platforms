@@ -1,0 +1,7 @@
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GET_HELP_FILE_TOOL            #language en-US ""
+STR_GET_HELP_FILE_TOOL
+".TH bosc_file_tool 0 "Basic Dump Block command."\r\n"
