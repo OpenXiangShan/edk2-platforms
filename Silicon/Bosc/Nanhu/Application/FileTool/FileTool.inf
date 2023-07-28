@@ -1,0 +1,42 @@
+[Defines]
+  INF_VERSION = 0x00010006
+  BASE_NAME = UefiShellFileTool
+  FILE_GUID = 60BDD8A8-7579-4A7A-950C-EF458C449FE9
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR = ShellBoscFileToolConstructor
+  DESTRUCTOR  = ShellBoscFileToolDestructor
+
+[Sources]
+  FileTool.c
+  FileTool.uni
+
+[Packages]
+  Silicon/Bosc/Bosc.dec
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  PcdLib
+
+[Guids]
+  gEfiBoscSiliconTokenSpaceGuid
+  gShellFileToolHiiGuid
+
+[pcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid
