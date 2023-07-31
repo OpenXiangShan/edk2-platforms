@@ -126,7 +126,7 @@ WriteFromMem (
   ValueStr = ShellCommandLineGetRawValue (CheckPackage, 1);
   addr = ShellHexStrToUintn (ValueStr);
   ValueStr = ShellCommandLineGetRawValue (CheckPackage, 2);
-  len = ShellHexStrToUintn (ValueStr);
+  len = ShellStrToUintn (ValueStr);
   FileName = (CHAR16 *)ShellCommandLineGetRawValue (CheckPackage, 3);
 
   Status = OpenFile (&FileHandle, FileName, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE);
