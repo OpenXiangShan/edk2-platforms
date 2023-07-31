@@ -120,7 +120,8 @@ WriteFromMem (
   CONST CHAR16      *ValueStr;
   CHAR16            *FileName;
   EFI_LBA           addr;
-  UINTN             len;
+  INTN              len;
+  UINTN             WriteLen;
 
   ValueStr = ShellCommandLineGetRawValue (CheckPackage, 1);
   addr = ShellHexStrToUintn (ValueStr);
@@ -134,21 +135,28 @@ WriteFromMem (
     return;
   }
 
-  Status = SetFilePosition (FileHandle, 0);
-  if (EFI_ERROR (Status)) {
-    Print (L"Set File Position failed\n");
-    return;
-  }
+  Print (L"Write From Memory start. FileName: %s addr: 0x%lx len: %d\n", FileName, addr, len);
 
-  Status = WriteFile (FileHandle, &len, (void *)addr);
-  if (Status != EFI_SUCCESS) {
-    Print (L"Write file failed, addr:0x%lx\n", addr);
-    return;
+  while (len > 0) {
+    if (len > 512)
+      WriteLen = 512;
+    else
+      WriteLen = len;
+
+    Status = WriteFile (FileHandle, &WriteLen, (void *)addr);
+    if (Status != EFI_SUCCESS) {
+      Print (L"Write file failed, addr:0x%lx\n", addr);
+      CloseFile (FileHandle);
+      return;
+    }
+
+    addr += WriteLen;
+    len -= WriteLen;
   }
 
   CloseFile (FileHandle);
 
-  Print (L"Write From Memory success. FileName: %s addr: 0x%lx len: %d", FileName, addr, len);
+  Print (L"Write From Memory success. FileName: %s end addr: 0x%lx remain len: %d", FileName, addr, len);
 
   return;
 }
