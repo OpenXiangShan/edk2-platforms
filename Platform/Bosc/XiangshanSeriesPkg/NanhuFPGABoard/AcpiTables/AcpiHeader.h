@@ -22,6 +22,16 @@
 #define EFI_ACPI_CREATOR_ID                   SIGNATURE_32 ('E','D','K','2')
 #define EFI_ACPI_CREATOR_REVISION             0x00000001
 
+///
+/// RHCT Revision
+///
+#define EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_REVISION  0x01
+
+///
+/// "RHCT" Rhct Description Table
+///
+#define EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('R', 'H', 'C', 'T')
+
 #define ACPI_HEADER(Signature, Type, Revision) {                  \
     Signature,                      /* UINT32  Signature */       \
     sizeof (Type),                  /* UINT32  Length */          \
