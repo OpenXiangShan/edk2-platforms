@@ -239,6 +239,11 @@ ShellCommandRunDumpBlock (
 
   Print (L"Bosc Dump Block...\n");
 
+  if (BlockIoCount == 0) {
+    Print (L"Error - BlockIo Count is 0\n");
+    return SHELL_ABORTED;
+  }
+
   Status = ShellInitialize ();
   if (EFI_ERROR (Status)) {
     Print (L"Error - failed to initialize shell\n");
@@ -282,8 +287,6 @@ ShellBoscDumpBlockLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS     Status;
-
   gShellDumpBlockHiiHandle = HiiAddPackages (
                         &gShellDumpBlockHiiGuid, gImageHandle,
                         UefiShellDumpBlockToolLibStrings, NULL
@@ -297,10 +300,7 @@ ShellBoscDumpBlockLibConstructor (
      L"DumpBlock", TRUE , gShellDumpBlockHiiHandle, STRING_TOKEN (STR_GET_HELP_DUMP_BLOCK_IO)
      );
 
-  Status = FindAllBlockIo ();
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
+  FindAllBlockIo ();
 
   return EFI_SUCCESS;
 }
