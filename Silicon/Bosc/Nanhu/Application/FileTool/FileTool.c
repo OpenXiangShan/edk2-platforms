@@ -175,6 +175,22 @@ ShellCommandRunFileTool (
 
   Print (L"Run File Tool...\n");
 
+  if (!gFileRoot) {
+    Status = gBS->LocateProtocol (
+		  &gEfiSimpleFileSystemProtocolGuid,
+		  NULL,
+		  (VOID**)&gSimpleFileSystem
+		  );
+
+    if (EFI_ERROR(Status))
+      return Status;
+
+    Status = gSimpleFileSystem->OpenVolume(gSimpleFileSystem, &gFileRoot);
+
+    if (EFI_ERROR(Status))
+      return Status;
+  }
+
   Status = ShellInitialize ();
   if (EFI_ERROR (Status)) {
     Print (L"Error - failed to initialize shell\n");
@@ -209,8 +225,6 @@ ShellBoscFileToolConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS     Status;
-
   gShellFileToolHiiHandle = HiiAddPackages (
                         &gShellFileToolHiiGuid, gImageHandle,
                         UefiShellFileToolStrings, NULL
@@ -224,18 +238,7 @@ ShellBoscFileToolConstructor (
      L"FileIo", TRUE , gShellFileToolHiiHandle, STRING_TOKEN (STR_GET_HELP_FILE_TOOL)
      );
 
-  Status = gBS->LocateProtocol (
-		&gEfiSimpleFileSystemProtocolGuid,
-		NULL,
-		(VOID**)&gSimpleFileSystem
-		);
-
-  if (EFI_ERROR(Status))
-    return Status;
-
-  Status = gSimpleFileSystem->OpenVolume(gSimpleFileSystem, &gFileRoot);
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
