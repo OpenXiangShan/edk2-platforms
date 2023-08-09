@@ -1,0 +1,29 @@
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = KunMingHuAcpiTables
+  FILE_GUID                      = 84D13218-81C2-4BD5-BC52-84C07D0C253D
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  Fadt.aslc
+  Dsdt/Dsdt.asl
+  Madt.aslc
+  Rhct.aslc
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+
+[BuildOptions]
+  GCC:*_*_*_ASL_FLAGS       = -vw3133 -vw3150
+
+

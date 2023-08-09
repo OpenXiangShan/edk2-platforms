@@ -1,0 +1,108 @@
+/** @file
+*  Multiple APIC Description Table (MADT)
+*
+*  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+*  Copyright (c) 2012 - 2016, ARM Limited. All rights reserved.
+*  Copyright (c) 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#include "AcpiHeader.h"
+
+//
+// Multiple APIC Description Table
+//
+#pragma pack (1)
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT32 Reference;
+  UINT8  Enable;
+  UINT8  MaxPriority;
+  UINT16 NumberOfDev;
+  UINT32 BaseAddress;
+  UINT32 MmioSize;
+  UINT16 NumberOfHart;
+} EFI_ACPI_PLIC_STRUCTURE;
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT8  Version;
+  UINT8  Reserved;
+  UINT32 Flags;
+  UINT64 HartId;
+  UINT32 Uid;
+} EFI_ACPI_INTC_STRUCTURE;
+
+typedef struct {
+  UINT8   Type;
+  UINT8   Length;
+  UINT32  Reference;
+  UINT8   ObjectName[20];
+} EFI_ACPI_MADT_NAMED_COMP_NODE;
+
+typedef struct {
+  EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_INTC_STRUCTURE                               Intc;
+  EFI_ACPI_PLIC_STRUCTURE                               Plic;
+  EFI_ACPI_MADT_NAMED_COMP_NODE                         NamedCompNode[2];
+} EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    ACPI_HEADER (
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    //
+    // MADT specific fields
+    //
+    0, // LocalApicAddress
+    0, // Flags
+  },
+  EFI_ACPI_INTC_INIT (0, 0),
+  {
+    0x19,                                                            /* UINT8   Type */
+    sizeof (EFI_ACPI_PLIC_STRUCTURE),                                /* UINT8   Length */
+    OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Intc),  /* UINT32  Reference */
+    1,                                                               /* UINT8   Enable */
+    7,                                                               /* UINT8   MaxPriority */
+    64,                                                              /* UINT16  NumberOfDev */
+    0x3c000000,                                                      /* UINT32  BaseAddress */
+    0x4000000,                                                       /* UINT32  MmioSize */
+    2,                                                               /* UINT16  NumberOfHart */
+  },
+  {
+    {
+      //NamedCompNode[0]
+      0x1A,                                                           /* UINT8 Type */
+      sizeof (EFI_ACPI_MADT_NAMED_COMP_NODE),                         /* UINT8 Length */
+      OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Plic), /* UINT32 Reference*/
+      "\\_SB_.SDH0",                                                  /* ObjectName */
+    },
+    {
+      //NamedCompNode[1]
+      0x1A,                                                           /* UINT8 Type */
+      sizeof (EFI_ACPI_MADT_NAMED_COMP_NODE),                         /* UINT8 Length */
+      OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Plic), /* UINT32 Reference*/
+      "\\_SB_.COM0",                                                  /* ObjectName */
+    },
+   },
+};
+
+//
+// Reference the table being generated to prevent the optimizer
+// from removing the data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Madt;

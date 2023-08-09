@@ -1,0 +1,126 @@
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#include "AcpiHeader.h"
+
+#define N_NODE 1                //Number of hart
+#define N_HART_INFO_OFFSET 1    //Number of entry in hart info node
+
+#pragma pack (1)
+
+typedef struct {
+  UINT16 Type;
+  UINT16 Length;
+  UINT16 Revision;
+} EFI_RHCT_NODE_HEADER;
+
+typedef struct {
+  UINT16                   NumOffsets;
+  UINT32                   Uid;
+} EFI_RHCT_HART_INFO;
+
+typedef struct {
+  EFI_RHCT_NODE_HEADER     Header;
+  EFI_RHCT_HART_INFO       HartInfo;
+} EFI_RHCT_HART_INFO_STRUCT;
+
+typedef struct {
+  UINT32 Offset[N_HART_INFO_OFFSET];
+} EFI_RHCT_HART_NODE_INFO_OFFSET;
+
+typedef struct {
+  UINT16 IsaLength;
+  UINT8  IsaString[16];    //Need to adjust array size based on IsaLength
+} EFI_RHCT_ISA_STRING;
+
+typedef struct {
+  EFI_RHCT_NODE_HEADER     Header;
+  EFI_RHCT_ISA_STRING      IsaData;
+} EFI_RHCT_ISA_STRING_STRUCT;
+
+typedef struct {
+  EFI_RHCT_HART_INFO_STRUCT      HartInfo;
+  EFI_RHCT_HART_NODE_INFO_OFFSET Offset;
+  EFI_RHCT_ISA_STRING_STRUCT     Isa_node;
+} EFI_RHCT_NODE_DATA;
+
+typedef struct {
+  UINT32 Reserved;
+  UINT64 BaseFrequency;
+  UINT32 NodeNumber;
+  UINT32 OffsetToNodeArray;
+} EFI_RHCT_HEADER_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  EFI_RHCT_HEADER_STRUCTURE      RhctHeader;
+  EFI_RHCT_NODE_DATA             Node[N_NODE];
+} EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE Rhct = {
+  /*EFI_ACPI_DESCRIPTION_HEADER*/
+  ACPI_HEADER (
+    EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_SIGNATURE,
+    EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE,
+    EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_REVISION
+  ),
+  /*EFI_RHCT_HEADER_STRUCTURE*/
+  {
+    0,                    // Reserved
+    500000,               // BaseFrequency
+    2,                    // NodeNumber
+    56                    // NodeOffset -- the offset from the start of the table to the first node
+  },
+  /*EFI_RHCT_NODE_DATA*/
+  {
+    /*HART[0]*/
+    {
+      /*EFI_RHCT_HART_INFO_STRUCT*/
+      {
+        /*EFI_RHCT_NODE_HEADER*/
+        {
+          0xFFFF,                                           //Type 0xFFFF -> hart info
+          sizeof(EFI_RHCT_HART_INFO_STRUCT) +
+	  sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET) +
+	  sizeof(EFI_RHCT_ISA_STRING_STRUCT),               //Length
+          1,                                                //Revision
+        },
+        /*EFI_RHCT_HART_INFO*/
+        {
+          1,                                                //NumberOffsets
+          0,                                                //Uid
+        },
+      },
+      /*EFI_RHCT_HART_NODE_INFO_OFFSET*/
+      {
+        /*Offset[0] -- the offset from the start of the table to this node entry*/
+        {
+          sizeof(EFI_ACPI_DESCRIPTION_HEADER) +
+          sizeof(EFI_RHCT_HEADER_STRUCTURE) +
+	  sizeof(EFI_RHCT_NODE_DATA) * 0 +
+	  sizeof(EFI_RHCT_HART_INFO_STRUCT) +
+          sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET)
+	}
+      },
+      /*EFI_RHCT_ISA_STRING_STRUCT*/
+      {
+        /*EFI_RHCT_NODE_HEADER*/
+        {
+          0,                                                           //Type 0x0000 -> isa string
+          sizeof(EFI_RHCT_NODE_HEADER) + sizeof(EFI_RHCT_ISA_STRING),  //Length
+          1                                                            //Revision
+        },
+        /*EFI_RHCT_ISA_STRING*/
+        {
+          16,                                                          //length of isa string
+	  "rv64imafdc"                                                 //isa string
+        },
+      },
+    },
+  },
+};
+
+VOID* CONST ReferenceAcpiTable = &Rhct;

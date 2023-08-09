@@ -1,0 +1,10 @@
+[Defines]
+  DEC_SPECIFICATION = 0x00010005
+  PACKAGE_NAME      = KunMingHu
+  PACKAGE_GUID      = CAC123AD-5D9C-468C-B0D8-D1B88239AD39
+  PACKAGE_VERSION   = 0.1
+
+[Guids]
+  gEfiDemoLoaderProtocolGuid = { 0xd002fa75, 0xce30, 0x4f48, { 0x9d, 0x61, 0xbe, 0xba, 0x3d, 0xfb, 0xeb, 0x6d }}
+
+[PcdsFixedAtBuild]
