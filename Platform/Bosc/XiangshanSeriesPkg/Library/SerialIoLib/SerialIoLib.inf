@@ -32,8 +32,8 @@
   RiscVOpensbiLib
 
 [FixedPcd]
-  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase
-  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock
+  gXiangShanPlatformsPkgTokenSpaceGuid.PcdUartBase
+  gXiangShanPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock
 
 [Sources]
   SerialPortLib.c

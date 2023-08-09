@@ -20,12 +20,12 @@
 [LibraryClasses]
 
 [Guids]
-  gBoscNanhuPlatformsPkgTokenSpaceGuid  = {0x12115609, 0x4da5, 0x41cb, { 0x9c, 0x27, 0x74, 0xa1, 0x8e, 0x59, 0x69, 0xd0 }}
+  gXiangShanPlatformsPkgTokenSpaceGuid  = {0x12115609, 0x4da5, 0x41cb, { 0x9c, 0x27, 0x74, 0xa1, 0x8e, 0x59, 0x69, 0xd0 }}
 
 [PcdsFixedAtBuild]
-  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock|0x0|UINT32|0x00001000
-  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdNumberofCores|0x8|UINT32|0x00001001
-  gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase|0x0|UINT32|0x00001003
+  gXiangShanPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock|0x0|UINT32|0x00001000
+  gXiangShanPlatformsPkgTokenSpaceGuid.PcdNumberofCores|0x8|UINT32|0x00001001
+  gXiangShanPlatformsPkgTokenSpaceGuid.PcdUartBase|0x0|UINT32|0x00001003
 
 [PcdsPatchableInModule]
 

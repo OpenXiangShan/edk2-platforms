@@ -420,7 +420,7 @@
     NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
 
-  Platform/Bosc/XiangshanSeriesPkg/Pei/PlatformPei/PlatformPei.inf {
+  Platform/Bosc/XiangshanSeriesPkg/Universal/Pei/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
@@ -542,18 +542,18 @@
   #
   # Mmc host support
   #
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
-  Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
+  Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
-  # Nanhu Loader
+  # Linux Loader
   #
   Silicon/Bosc/Nanhu/Loader/Loader.inf
 
   #
   # Linux Lodaer
   #
-  Silicon/Bosc/Nanhu/Application/LinuxLoader/LinuxLoader.inf
+  Silicon/Bosc/Application/LinuxLoader/LinuxLoader.inf
 
   #
   # Acpi Support
@@ -585,9 +585,9 @@
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
-      NULL|Silicon/Bosc/Nanhu/Application/DumpBlockIo/DumpBlockIo.inf
-      NULL|Silicon/Bosc/Nanhu/Application/FileTool/FileTool.inf
-      NULL|Silicon/Bosc/Nanhu/Application/LoaderTool/LoaderTool.inf
+      NULL|Silicon/Bosc/Application/DumpBlockIo/DumpBlockIo.inf
+      NULL|Silicon/Bosc/Application/FileTool/FileTool.inf
+      NULL|Silicon/Bosc/Application/LoaderTool/LoaderTool.inf
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
       FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
       SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
@@ -607,4 +607,4 @@
   MdeModulePkg/Application/UiApp/UiApp.inf
 
   Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/DwEmacSnpDxe/DwEmacSnpDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/DwEmacSnpDxe/DwEmacSnpDxe.inf

@@ -91,7 +91,7 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase = $(CODE_BASE_ADDRES
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize = 0x10000
 
 SET gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz    = 500000
-SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock = 50000000   # 50Mhz system clock
+SET gXiangShanPlatformsPkgTokenSpaceGuid.PcdPlatformSystemClock = 50000000   # 50Mhz system clock
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId                  = 0          # Boot hart ID
 SET gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId                           = 0          # use for Loader, must be the same as gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
 
@@ -104,6 +104,6 @@ SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber          = 2
 #
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId       = {0x0, 0x1}
                                                                                     # during boot
-#SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdNumberofCores       = 1          # Total cores enabled
-SET gBoscNanhuPlatformsPkgTokenSpaceGuid.PcdUartBase            = 0x310B0000 # Serial port base address
+#SET gXiangShanPlatformsPkgTokenSpaceGuid.PcdNumberofCores       = 1          # Total cores enabled
+SET gXiangShanPlatformsPkgTokenSpaceGuid.PcdUartBase            = 0x310B0000 # Serial port base address
 SET gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode        = 1          # Set PeiCore to S-Mode

@@ -109,7 +109,7 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 # RISC-V Platform PEI Driver
-INF  Platform/Bosc/XiangshanSeriesPkg/Pei/PlatformPei/PlatformPei.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Pei/PlatformPei/PlatformPei.inf
 INF  Platform/RISC-V/PlatformPkg/Universal/FdtPeim/FdtPeim.inf
 
 ################################################################################
@@ -161,7 +161,7 @@ INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/Fvb
 # RISC-V Core Drivers
 INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
 INF  Silicon/RISC-V/ProcessorPkg/Universal/CpuDxe/CpuDxe.inf
-INF  Silicon/RISC-V/ProcessorPkg/Universal/SmbiosDxe/RiscVSmbiosDxe.inf
+#INF  Silicon/RISC-V/ProcessorPkg/Universal/SmbiosDxe/RiscVSmbiosDxe.inf
 
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
@@ -228,12 +228,12 @@ INF  MdeModulePkg/Application/UiApp/UiApp.inf
 #
 # Mmc Host Support
 #
-INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
-INF Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+INF Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
+INF Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
 # GMAC Support
 INF  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
-INF  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/DwEmacSnpDxe/DwEmacSnpDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/DwEmacSnpDxe/DwEmacSnpDxe.inf
 
 #
 # ACPI
