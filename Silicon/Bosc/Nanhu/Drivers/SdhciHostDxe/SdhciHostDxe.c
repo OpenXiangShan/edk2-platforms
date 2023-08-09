@@ -15,7 +15,6 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 
-#define CONFIG_MMC_SDHCI_SDMA
 #define word32   *(volatile unsigned int *)(long)
 
 // MMC/SD/SDIO1 register definitions.
