@@ -17,7 +17,7 @@
 #include <IndustryStandard/Acpi.h>
 
 #define EFI_ACPI_OEM_ID                       {'B','O','S','C',' ',' '}
-#define EFI_ACPI_OEM_TABLE_ID                 SIGNATURE_64 ('N','A','N','H','U',' ',' ',' ')
+#define EFI_ACPI_OEM_TABLE_ID                 SIGNATURE_64 ('K','M','H',' ',' ',' ',' ',' ')
 #define EFI_ACPI_OEM_REVISION                 0x00000001
 #define EFI_ACPI_CREATOR_ID                   SIGNATURE_32 ('E','D','K','2')
 #define EFI_ACPI_CREATOR_REVISION             0x00000001
