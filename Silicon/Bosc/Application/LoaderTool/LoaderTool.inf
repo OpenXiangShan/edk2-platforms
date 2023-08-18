@@ -43,3 +43,6 @@
 
 [Guids]
   gShellLoaderToolHiiGuid
+
+[Protocols]
+  gEdkiiPeCoffImageEmulatorProtocolGuid
