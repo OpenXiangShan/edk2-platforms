@@ -54,4 +54,9 @@
     Uid                     /* UINT32  ACPI Processor UID*/    \
   }
 
+///
+/// MSI
+///
+#define XDMA_MSI_IRQ_CONTROLLER 0x0
+
 #endif
