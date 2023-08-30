@@ -303,6 +303,9 @@
   PlatformBootManagerLib|Platform/RISC-V/PlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   PlatformMemoryTestLib|Platform/RISC-V/PlatformPkg/Library/PlatformMemoryTestLibNull/PlatformMemoryTestLibNull.inf
   PlatformUpdateProgressLib|Platform/RISC-V/PlatformPkg/Library/PlatformUpdateProgressLibNull/PlatformUpdateProgressLibNull.inf
+  # Pci dependencies
+  PciSegmentLib|Silicon/Bosc/Nanhu/Library/PciSegmentLib/PciSegmentLib.inf
+  PciHostBridgeLib|Silicon/Bosc/Nanhu/Library/PciHostBridgeLib/PciHostBridgeLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -392,6 +395,25 @@
 ################################################################################
 [PcdsFixedAtBuild.common]
   gEfiBoscSiliconTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x30050000
+  #
+  # XILINX PCI Root Complex
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x40000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x50000000
+  gBoscPlatformTokenSpaceGuid.PcdPciConfigBase|0x40000000
+  gBoscPlatformTokenSpaceGuid.PcdPciConfigSize|0x10000000
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMin|0
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMax|255
+  gBoscPlatformTokenSpaceGuid.PcdPciIoBase|0x00000
+  gBoscPlatformTokenSpaceGuid.PcdPciIoSize|0xf00000
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Base|0x50000000
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Size|0x10000000
+  #gBoscPlatformTokenSpaceGuid.PcdPciMmio64Base|0x1000000000
+  #gBoscPlatformTokenSpaceGuid.PcdPciMmio64Size|0x1000000000
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Base|0x1000000000
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Size|0x0000000000
 
 ################################################################################
 #
@@ -454,11 +476,6 @@
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 
-  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  }
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf {
@@ -542,8 +559,8 @@
   #
   # Mmc host support
   #
-  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
-  Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+#  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
+#  Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
   # Linux Loader
@@ -561,6 +578,23 @@
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/AcpiTables/AcpiTables.inf
   Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
+
+  #
+  # PCI Support
+  #
+  Silicon/Bosc/Nanhu/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+  MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
+
+  #
+  # NVME Support
+  #
+  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
@@ -606,5 +640,5 @@
 
   MdeModulePkg/Application/UiApp/UiApp.inf
 
-  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
-  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/DwEmacSnpDxe/DwEmacSnpDxe.inf
+#  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf
+#  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/DwEmacSnpDxe/DwEmacSnpDxe.inf

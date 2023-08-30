@@ -1,0 +1,47 @@
+#/** @file
+#  PCI Host Bridge Library instance for Bosc SOC.
+#
+#  Copyright (C) 2020, Bosc Technology Co, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PciHostBridgeLib
+  FILE_GUID                      = f965de0e-40fe-11eb-8290-3f9d1f895a80
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64 
+#
+
+[Sources]
+  PciHostBridgeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Bosc/BoscCommonPkg/BoscCommonPkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[Guids]
+
+[FixedPcd]
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMin
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMax
+  gBoscPlatformTokenSpaceGuid.PcdPciIoBase
+  gBoscPlatformTokenSpaceGuid.PcdPciIoSize
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Base
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Size
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Base
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Size
+  gBoscPlatformTokenSpaceGuid.PcdPciConfigBase

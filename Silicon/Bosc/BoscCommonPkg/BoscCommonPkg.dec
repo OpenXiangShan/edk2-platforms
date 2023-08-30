@@ -1,0 +1,63 @@
+## @file
+# This package provides common Bosc silicon modules.
+#
+# Copyright (C) 2020, Bosc Technology Co,Ltd. All rights reserved.
+#
+# SPDX-License-Identifier:BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = BoscCommnonPkg
+  PACKAGE_GUID                   = b34af0b4-3e7c-11eb-a9d0-0738806d2dec
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+#Include             # Root include for the package
+
+[Guids.common]
+  gBoscPlatformTokenSpaceGuid = { 0xa7d63bca, 0x278b, 0x454b, { 0x80, 0x89, 0x65, 0x9a, 0x5a, 0x60, 0x86, 0x19 } }
+
+[PcdsFixedAtBuild.common]
+  gBoscPlatformTokenSpaceGuid.PcdSystemIoBase|0x0|UINT64|0x00000000
+  gBoscPlatformTokenSpaceGuid.PcdSystemIoSize|0x0|UINT64|0x00000001
+
+  #
+  # PCI configuration address space
+  #
+  gBoscPlatformTokenSpaceGuid.PcdPciConfigBase|0x0|UINT64|0x00000002
+  gBoscPlatformTokenSpaceGuid.PcdPciConfigSize|0x0|UINT64|0x00000003
+
+  gBoscPlatformTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x00000004
+  gBoscPlatformTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000005
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000006
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000007
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x00000008
+  gBoscPlatformTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x00000009
+
+  #
+  # Inclusive range of allowed PCI buses.
+  #
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x0000000a
+  gBoscPlatformTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000000b
+#  #
+#  # SPI Flash Controller Register Base Address and Size
+#  #
+#  gBoscPlatformTokenSpaceGuid.PcdSpiFlashBase|0x0|UINT64|0x00000004
+#  gBoscPlatformTokenSpaceGuid.PcdSpiFlashSize|0x0|UINT64|0x00000005
+#  gBoscPlatformTokenSpaceGuid.PcdSpiControllerBase|0x0|UINT64|0x00000006
+#  gBoscPlatformTokenSpaceGuid.PcdSpiControllerSize|0x0|UINT64|0x00000007
+#  gBoscPlatformTokenSpaceGuid.PcdRtcBaseAddress|0x0|UINT32|0x00000008
+#
+#[Protocols]
+#  gSpiMasterProtocolGuid = { 0xdf093560, 0xf955, 0x11ea, { 0x96, 0x42, 0x43, 0x9d, 0x80, 0xdd, 0x0b, 0x7c}}

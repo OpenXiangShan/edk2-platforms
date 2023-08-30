@@ -150,8 +150,6 @@ INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
@@ -180,16 +178,19 @@ INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
-INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+
+# file system
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  FatPkg/EnhancedFatDxe/Fat.inf
+
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 INF  Silicon/RISC-V/ProcessorPkg/Universal/FdtDxe/FdtDxe.inf
 
@@ -213,16 +214,6 @@ INF  Silicon/Bosc/Nanhu/Loader/Loader.inf
 
 !include NetworkPkg/Network.fdf.inc
 
-#
-# Usb Support
-#
-INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
 
 #
@@ -241,6 +232,29 @@ INF  MdeModulePkg/Application/UiApp/UiApp.inf
 INF RuleOverride=ACPITABLE Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/AcpiTables/AcpiTables.inf
 INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
+
+#
+# PCI Support
+#
+INF Silicon/Bosc/Nanhu/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
+INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+
+#
+# NVMe boot devices
+#
+INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
+#
+# Usb Support
+#
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
