@@ -1,0 +1,72 @@
+/** @file
+*  PCI Express Memory-mapped Configuration Space base address description table (MCFG)
+*
+*  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Library/AcpiLib.h>
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include "AcpiHeader.h"
+
+#define MCFG_VERSION  0x1
+
+#pragma pack (1)
+
+typedef struct {
+   UINT64 BaseAddress; // Base Address
+   UINT16 SegGroupNum; // Segment Group Number
+   UINT8  StartBusNum; // Start Bus Number
+   UINT8  EndBusNum;   // End Bus Number
+   UINT32 Reserved2;
+} EFI_MCFG_CONFIG_STRUCTURE;
+
+typedef struct {
+   EFI_ACPI_DESCRIPTION_HEADER Header;
+   UINT64 Reserved1;
+} EFI_MCFG_TABLE_CONFIG;
+
+typedef struct {
+   EFI_MCFG_TABLE_CONFIG Acpi_Table_Mcfg;
+   EFI_MCFG_CONFIG_STRUCTURE Config_Structure[2];
+} EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+
+#pragma pack ()
+
+EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg= {
+  {
+    {
+      EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+      MCFG_VERSION,
+      0x00,                                                  // Checksum will be updated at runtime
+      EFI_ACPI_OEM_ID,
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+    EFI_ACPI_RESERVED_QWORD,                                 //Reserved
+  },
+  {
+    {
+      0x48000000,                                            //BaseAddress
+      0,
+      0,
+      2,
+      EFI_ACPI_RESERVED_DWORD,
+    },
+    {
+      0x4C000000,
+      1,
+      0,
+      2,
+      EFI_ACPI_RESERVED_DWORD,
+    },
+  }
+};
+
+VOID* CONST ReferenceAcpiTable = &Mcfg;

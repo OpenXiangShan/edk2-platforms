@@ -64,8 +64,8 @@ typedef struct {
   EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
   EFI_ACPI_INTC_STRUCTURE                               Intc[2];
   EFI_ACPI_PLIC_STRUCTURE                               Plic;
-  EFI_ACPI_XDMA_MSI_STRUCTURE                           Msi[2];
-  EFI_ACPI_MADT_NAMED_COMP_NODE                         NamedCompNode[4];
+  EFI_ACPI_XDMA_MSI_STRUCTURE                           Msi[1];
+  EFI_ACPI_MADT_NAMED_COMP_NODE                         NamedCompNode[3];
 } EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
 #pragma pack ()
@@ -103,21 +103,11 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
       0x1C,                                                            /* UINT8  Type */
       sizeof(EFI_ACPI_XDMA_MSI_STRUCTURE),                             /* UINT8  Length */
       OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Plic),  /* UINT32 Reference */
-      0x48000000,                                                      /* UINT32 BaseAddress */
+      0x40000000,                                                      /* UINT32 BaseAddress */
       0x2000000,                                                       /* UINT32 MmioSize */
       53,                                                              /* UINT8  GsiMisc*/
       52,                                                              /* UINT8  GsiLow*/
       51,                                                              /* UINT8  GsiHigh*/
-    },
-    {
-      0x1C,                                                            /* UINT8  Type */
-      sizeof(EFI_ACPI_XDMA_MSI_STRUCTURE),                             /* UINT8  Length */
-      OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Plic),  /* UINT32 Reference */
-      0x4c000000,                                                      /* UINT32 BaseAddress */
-      0x4000000,                                                       /* UINT32 MmioSize */
-      59,                                                              /* UINT8  GsiMisc*/
-      58,                                                              /* UINT8  GsiLow */
-      57,                                                              /* UINT8  GsiHigh */
     },
   },
   {
@@ -141,13 +131,6 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
       sizeof (EFI_ACPI_MADT_NAMED_COMP_NODE),                            /* UINT8 Length */
       OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Msi[0]),  /* UINT32 Reference*/
       "\\_SB_.PCI0",                                                     /* ObjectName */
-    },
-    {
-      //NamedCompNode[3]
-      0x1A,                                                              /* UINT8 Type */
-      sizeof (EFI_ACPI_MADT_NAMED_COMP_NODE),                            /* UINT8 Length */
-      OFFSET_OF (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE, Msi[1]),  /* UINT32 Reference*/
-      "\\_SB_.PCI1",                                                     /* ObjectName */
     },
    },
 };
