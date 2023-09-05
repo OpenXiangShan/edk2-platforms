@@ -228,8 +228,8 @@ INF  MdeModulePkg/Application/UiApp/UiApp.inf
 #
 # Mmc Host Support
 #
-INF Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
-INF Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+#INF Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
+#INF Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
 # GMAC Support
 #INF  Platform/Bosc/XiangshanSeriesPkg/Library/PeripheralRegister/PeripheralRegister.inf

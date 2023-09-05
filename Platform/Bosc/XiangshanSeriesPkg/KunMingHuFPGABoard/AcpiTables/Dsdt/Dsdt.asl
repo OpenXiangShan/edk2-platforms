@@ -13,6 +13,7 @@ DefinitionBlock ("DsdtTable.aml", "DSDT",
                  "BOSC  ", "KMH  ", FixedPcdGet32 (PcdAcpiDefaultOemRevision)) {
   Scope (_SB) {
     include ("Uart.asl")
-    include ("sd.asl")
+    //include ("sd.asl")
+    include ("Pci.asl")
   } // Scope (_SB)
 }

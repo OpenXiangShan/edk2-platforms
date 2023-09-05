@@ -10,6 +10,7 @@
   Dsdt/Dsdt.asl
   Madt.aslc
   Rhct.aslc
+  Mcfg.aslc
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
