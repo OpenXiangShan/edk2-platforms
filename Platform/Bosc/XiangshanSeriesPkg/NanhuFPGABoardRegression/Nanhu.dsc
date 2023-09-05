@@ -13,7 +13,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = NanhuFPGA
+  PLATFORM_NAME                  = NanhuFPGARegression
   PLATFORM_GUID                  = 8317E90F-428B-403F-9057-112B0C19008E
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001c
@@ -21,7 +21,7 @@
   SUPPORTED_ARCHITECTURES        = RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Nanhu.fdf
+  FLASH_DEFINITION               = Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Nanhu.fdf
 
   #
   # Enable below options may cause build error or may not work on
@@ -173,7 +173,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
   Edk2OpensbiPlatformWrapperLib|Platform/RISC-V/PlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
-  RiscVSpecialPlatformLib|Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
+  RiscVSpecialPlatformLib|Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
@@ -532,7 +532,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/DeviceTree/NanhuDeviceTree.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/DeviceTree/NanhuDeviceTree.inf
 
   #
   # SMBIOS Support
@@ -559,7 +559,7 @@
   #
   # Mmc host support
   #
-#  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/MmcDxe/MmcDxe.inf
+#  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Drivers/MmcDxe/MmcDxe.inf
 #  Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
@@ -576,8 +576,8 @@
   # Acpi Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/AcpiTables/AcpiTables.inf
-  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/AcpiTables/AcpiTables.inf
+  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
 
   #
   # PCI Support

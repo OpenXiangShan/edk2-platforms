@@ -18,8 +18,8 @@ Scope(_SB)
       QWordMemory (  // 64-bit BAR Windows
         ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
         0,                             // Granularity
-        0x0000000060000000,            // Min Base Address
-        0x000000007FFFFFFF,            // Max Base Address
+        0x0000000050000000,            // Min Base Address
+        0x000000006FFFFFFF,            // Max Base Address
         0x0000000000000000,            // Translate
         0x0000000020000000,            // Length
       )

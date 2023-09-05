@@ -229,9 +229,9 @@ INF  MdeModulePkg/Application/UiApp/UiApp.inf
 #
 # ACPI
 #
-INF RuleOverride=ACPITABLE Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/AcpiTables/AcpiTables.inf
+INF RuleOverride=ACPITABLE Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/AcpiTables/AcpiTables.inf
 INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoard/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
+INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
 
 #
 # PCI Support
