@@ -38,11 +38,11 @@ DATA = { 0x00, 0x00, 0xa0, 0x83, 0x00, 0x00, 0x00, 0x00 } #Must be consistent wi
 
 $(KERNEL_OFFSET)|$(KERNEL_SIZE)
 gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
-FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/Image
+FILE = edk2-platforms/Silicon/Bosc/NanhuRegression/Loader/Image
 
 $(DTB_OFFSET)|$(DTB_SIZE)
 gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
-FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/dump.dtb
+FILE = edk2-platforms/Silicon/Bosc/NanhuRegression/Loader/system.dtb
 
 ################################################################################
 
@@ -202,7 +202,7 @@ INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
 INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
-INF  Silicon/Bosc/Nanhu/Loader/Loader.inf
+INF  Silicon/Bosc/NanhuRegression/Loader/Loader.inf
 #
 # Network modules
 #
@@ -236,7 +236,7 @@ INF Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Drivers/PlatformAc
 #
 # PCI Support
 #
-INF Silicon/Bosc/Nanhu/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
+INF Silicon/Bosc/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
 INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 

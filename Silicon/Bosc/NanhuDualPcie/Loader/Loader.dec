@@ -1,0 +1,10 @@
+[Defines]
+  DEC_SPECIFICATION = 0x00010005
+  PACKAGE_NAME      = NanShan
+  PACKAGE_GUID      = 3bac6d5a-71e5-11ed-a925-00155d3c4600
+  PACKAGE_VERSION   = 0.1
+
+[Guids]
+  gEfiDemoLoaderProtocolGuid = { 0xe7e1efa6, 0x7607, 0x3a78, { 0xc7, 0xdd, 0x43, 0xe4, 0xbd, 0x72, 0xc1, 0x19 }}
+
+[PcdsFixedAtBuild]

@@ -38,11 +38,11 @@ DATA = { 0x00, 0x00, 0xa0, 0x83, 0x00, 0x00, 0x00, 0x00 } #Must be consistent wi
 
 $(KERNEL_OFFSET)|$(KERNEL_SIZE)
 gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
-FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/Image
+FILE = edk2-platforms/Silicon/Bosc/NanhuDualPcie/Loader/Image
 
 $(DTB_OFFSET)|$(DTB_SIZE)
 gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
-FILE = edk2-platforms/Silicon/Bosc/Nanhu/Loader/dump.dtb
+FILE = edk2-platforms/Silicon/Bosc/NanhuDualPcie/Loader/system.dtb
 
 ################################################################################
 
@@ -201,7 +201,7 @@ INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
 INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
-INF  Silicon/Bosc/Nanhu/Loader/Loader.inf
+INF  Silicon/Bosc/NanhuDualPcie/Loader/Loader.inf
 #
 # Network modules
 #

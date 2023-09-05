@@ -304,8 +304,8 @@
   PlatformMemoryTestLib|Platform/RISC-V/PlatformPkg/Library/PlatformMemoryTestLibNull/PlatformMemoryTestLibNull.inf
   PlatformUpdateProgressLib|Platform/RISC-V/PlatformPkg/Library/PlatformUpdateProgressLibNull/PlatformUpdateProgressLibNull.inf
   # Pci dependencies
-  PciSegmentLib|Silicon/Bosc/Nanhu/Library/PciSegmentLib/PciSegmentLib.inf
-  PciHostBridgeLib|Silicon/Bosc/Nanhu/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  PciSegmentLib|Silicon/Bosc/Library/PciSegmentLib/PciSegmentLib.inf
+  PciHostBridgeLib|Silicon/Bosc/Library/PciHostBridgeLib/PciHostBridgeLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -560,12 +560,12 @@
   # Mmc host support
   #
 #  Platform/Bosc/XiangshanSeriesPkg/NanhuFPGABoardRegression/Drivers/MmcDxe/MmcDxe.inf
-#  Silicon/Bosc/Nanhu/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+#  Silicon/Bosc/NanhuRegression/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
   # Linux Loader
   #
-  Silicon/Bosc/Nanhu/Loader/Loader.inf
+  Silicon/Bosc/NanhuRegression/Loader/Loader.inf
 
   #
   # Linux Lodaer
@@ -582,7 +582,7 @@
   #
   # PCI Support
   #
-  Silicon/Bosc/Nanhu/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
+  Silicon/Bosc/Drivers/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
     <LibraryClasses>

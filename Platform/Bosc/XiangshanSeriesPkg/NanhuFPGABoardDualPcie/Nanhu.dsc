@@ -548,7 +548,7 @@
   #
   # Linux Loader
   #
-  Silicon/Bosc/Nanhu/Loader/Loader.inf
+  Silicon/Bosc/NanhuDualPcie/Loader/Loader.inf
 
   #
   # Linux Lodaer
