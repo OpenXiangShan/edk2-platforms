@@ -542,8 +542,8 @@
   #
   # Mmc host support
   #
-  Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
-  Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  #Platform/Bosc/XiangshanSeriesPkg/Universal/Dxe/MmcDxe/MmcDxe.inf
+  #Silicon/Bosc/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
   # Loader
