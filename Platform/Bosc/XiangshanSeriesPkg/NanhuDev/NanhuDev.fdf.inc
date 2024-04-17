@@ -60,3 +60,4 @@ SET gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase              = 0x310B00
 SET gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate                   = 115200
 SET gHisiTokenSpaceGuid.PcdSerialPortSendDelay                        = 50
 SET gHisiTokenSpaceGuid.PcdUartClkInHz                                = 50000000
+
