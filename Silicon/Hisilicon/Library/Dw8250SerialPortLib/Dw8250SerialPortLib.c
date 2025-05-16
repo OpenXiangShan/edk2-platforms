@@ -158,8 +158,8 @@ SerialPortPoll (
 
 VOID SerialPortWriteChar(UINT8 scShowChar)
 {
+#if 0
     UINT32 ulLoop = 0;
-
     while(ulLoop < (UINT32)UART_SEND_DELAY)
     {
 
@@ -170,8 +170,10 @@ VOID SerialPortWriteChar(UINT8 scShowChar)
 
         ulLoop++;
     }
+#endif
     MmioWrite8 (UART_THR_REG, (UINT8)scShowChar);
 
+#if 0
     ulLoop = 0;
     while(ulLoop < (UINT32)UART_SEND_DELAY)
     {
@@ -181,7 +183,7 @@ VOID SerialPortWriteChar(UINT8 scShowChar)
         }
         ulLoop++;
     }
-
+#endif
     return;
 }
 
