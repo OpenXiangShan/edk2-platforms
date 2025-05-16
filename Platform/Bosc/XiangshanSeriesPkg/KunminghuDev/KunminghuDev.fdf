@@ -27,6 +27,11 @@ gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase|gUefiRiscVPlatformPkgToken
 FV = FVMAIN_COMPACT
 
 !include VarStore.fdf.inc
+
+$(KERNEL_OFFSET)|$(KERNEL_SIZE)
+gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+FILE = edk2-platforms/Silicon/Bosc/KunMingHuPkg/Application/LoaderTool/Image
+
 ################################################################################
 
 [FV.DXEFV]
@@ -64,7 +69,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRo
 INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
-INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+#INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 INF  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -148,6 +153,12 @@ INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
 
+#
+# ACPI
+#
+INF RuleOverride=ACPITABLE Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/AcpiTables/AcpiTables.inf
+INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+INF Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformAcpiDxe/PlatformAcpiDxe.inf
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -169,7 +180,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 FvNameGuid         = 27A72E80-3118-4c0c-8673-AA5B4EFA9613
 
-INF Silicon/Bosc/NanHuPkg/Sec/SecMain.inf
+INF Silicon/Bosc/KunMingHuPkg/Sec/SecMain.inf
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {

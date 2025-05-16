@@ -1,0 +1,7 @@
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GET_HELP_LOADER_TOOL            #language en-US ""
+STR_GET_HELP_LOADER_TOOL
+".TH bosc_loader 0 "Basic LOADERTOOL command."\r\n"

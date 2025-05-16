@@ -11,8 +11,8 @@
 DEFINE BLOCK_SIZE        = 0x1000
 
 DEFINE FW_BASE_ADDRESS   = 0x80200000
-DEFINE FW_SIZE           = 0x00800000
-DEFINE FW_BLOCKS         = 0x800
+DEFINE FW_SIZE           = 0x05000000
+DEFINE FW_BLOCKS         = 0x5000
 
 #
 # 0x000000-0x7DFFFF code
@@ -32,6 +32,12 @@ DEFINE VARS_BLOCKS       = 0x20
 #
 DEFINE FVMAIN_OFFSET                 = 0x00000000
 DEFINE FVMAIN_SIZE                   = 0x00780000
+
+#
+# Kernel memory Region
+#
+DEFINE KERNEL_OFFSET                 = 0x00a00000
+DEFINE KERNEL_SIZE                   = 0x3000000
 
 #
 # EFI Variable memory region.
