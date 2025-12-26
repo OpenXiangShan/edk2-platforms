@@ -94,7 +94,7 @@ EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE Rhct = {
   /*EFI_RHCT_HEADER_STRUCTURE*/
   {
     0,                    // Reserved
-    500000,               // BaseFrequency
+    1000000,              // BaseFrequency
     2,                    // NodeNumber
     56                    // NodeOffset -- the offset from the start of the table to the first node
   },
@@ -157,7 +157,7 @@ EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE Rhct = {
         /*EFI_RHCT_ISA_STRING*/
         {
           1024,                                                        //length of isa string
-	  "rv64imafdcvh_sdring_sha_shcounternw_shgatpa_shlcofideleg_shtvala_shvsatpa_shvstvala_shvstvecd_smaia_smcsrind_smdbltrp_smmpm_smnpm_smrnmi_smstateen_sspl13_ssaia_ssccptr_ssconfpmf_sscounterenw_sscsrind_ssdbltrp_ssnpm_sspm_ssstateen_ssstrict_sstc_sstvala_sstvecd_ssu64xl_supm_svade_svbare_svinval_svnapot_svpbmt_za64rs_zacas_zawrs_zba_zbb_zbc_zbkb_zbkc_zbkx_zbs_zcb_zcmop_zfa_zfh_zfhmin_zic64b_zicbom_zicbop_zicboz_ziccamoa_ziccif_zicclsm_ziccrse_zicntr_zicond_zicsr_zifencei_zihintntl_zihintpause_zihpm_zimop_zkn_zknd_zkne_zknh_zksed_zksh_zkt_zvbb_zvfn_zvfhmin_zvkt_zv1128b_zv132b_zv164b",                                        //isa string
+	  "rv64imafdcvh_sdring_sha_shcounternw_shgatpa_shlcofideleg_shtvala_shvsatpa_shvstvala_shvstvecd_smaia_smcsrind_smdbltrp_smmpm_smnpm_smrnmi_smstateen_sspl13_ssaia_ssccptr_ssconfpmf_sscounterenw_sscsrind_ssdbltrp_ssnpm_sspm_ssstateen_ssstrict_sstc_sstvala_sstvecd_ssu64xl_supm_svade_svbare_svinval_svnapot_za64rs_zacas_zawrs_zba_zbb_zbc_zbkb_zbkc_zbkx_zbs_zcb_zcmop_zfa_zfh_zfhmin_zic64b_zicbom_zicbop_zicboz_ziccamoa_ziccif_zicclsm_ziccrse_zicntr_zicond_zicsr_zifencei_zihintntl_zihintpause_zihpm_zimop_zkn_zknd_zkne_zknh_zksed_zksh_zkt_zvbb_zvfn_zvfhmin_zvkt_zv1128b_zv132b_zv164b",                                        //isa string
         },
       },
       /*EFI_RHCT_CMO_STRUCT*/
