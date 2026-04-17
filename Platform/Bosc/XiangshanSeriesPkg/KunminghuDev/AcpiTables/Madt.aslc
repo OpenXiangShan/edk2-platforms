@@ -15,6 +15,12 @@
 
 #include "AcpiHeader.h"
 
+#define KMH_CPU_NUM        4
+#define KMH_IMSIC_M_BASE   0x3a800000
+#define KMH_IMSIC_S_BASE   0x3b000000
+#define KMH_IMSIC_STRIDE   0x8000
+#define KMH_IMSIC_SIZE     0x8000
+
 //
 // Multiple APIC Description Table
 //
@@ -77,12 +83,14 @@ typedef struct {
 
 typedef struct {
   EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
-  EFI_ACPI_MADT_INTC_STRUCTURE                          Intc[1];
-  EFI_ACPI_MADT_IMSIC_STRUCTURE                         Imisc[1];
+  EFI_ACPI_MADT_INTC_STRUCTURE                          Intc[KMH_CPU_NUM];
+  EFI_ACPI_MADT_IMSIC_STRUCTURE                         Imsic[1];
   EFI_ACPI_MADT_APLIC_STRUCTURE                         Aplic[1];
 } EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
 #pragma pack ()
+
+#define KMH_MADT_INTC_ENTRY(_hart)  {   0x18,                              /* Type */   36,                                /* Length */   1,                                 /* Version */   0,                                 /* Reserved */   1,                                 /* Flags */   (_hart),                           /* HartId */   (_hart),                           /* Uid */   0,                                 /* ExtIntcId */   (KMH_IMSIC_S_BASE + ((_hart) * KMH_IMSIC_STRIDE)), /* ImsicBase */   KMH_IMSIC_SIZE                     /* ImsicSize */ }
 
 EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
   {
@@ -94,63 +102,47 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
     //
     // MADT specific fields
     //
-    0, // LocalApicAddress
-    0, // Flags
+    0,
+    0,
   },
   {
-    /* Intc[0] */
+    KMH_MADT_INTC_ENTRY (0),
+    KMH_MADT_INTC_ENTRY (1),
+    KMH_MADT_INTC_ENTRY (2),
+    KMH_MADT_INTC_ENTRY (3),
+  },
+  {
     {
-      0x18,                // Type
-      36,                  // Length
-      1,                   // Version
-      0,                   // Reserved
-      1,                   // Flags
-      0,                   // HartId
-      0,                   // Uid
-      0,                   // ExtIntcId
-      0x3b000000,          // ImsicBase
-      0x8000,              // ImsicSize
+      0x19,
+      16,
+      1,
+      0,
+      0,
+      255,
+      255,
+      3,
+      4,
+      0,
+      24,
     },
   },
   {
-    /* Imsic[0] */
     {
-      0x19,               // Type
-      16,                 // Length
-      1,                  // Version
-      0,                  // Reserved
-      0,                  // Flags
-      255,                // NumIds
-      255,                // NumGuestIds
-      3,                  // GuestIdxBits
-      4,                  // HartIdxBits
-      0,                  // GroupIdxBits
-      24,                 // GroupIdxShift
-    },
-  },
-  {
-    /* Aplic[0] */
-    {
-      0x1A,               // Type
-      36,                 // Length
-      1,                  // Version
-      0,                  // AplicId
-      0,                  // Flags
-      /* HwId[8] */
+      0x1A,
+      36,
+      1,
+      0,
+      0,
       {
         0, 0, 0, 0, 0, 0, 0, 0
       },
-      0,                  // NumIdcs
-      32,                 // NumSrcs
-      0,                  // GsiBase
-      0x31120000,         // BaseAddr
-      0x8000,             // Size
+      0,
+      96,
+      0,
+      0x31120000,
+      0x8000,
     },
   },
 };
 
-//
-// Reference the table being generated to prevent the optimizer
-// from removing the data structure from the executable
-//
 VOID* CONST ReferenceAcpiTable = &Madt;

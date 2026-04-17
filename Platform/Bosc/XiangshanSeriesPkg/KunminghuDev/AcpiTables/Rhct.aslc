@@ -4,8 +4,9 @@
 
 #include "AcpiHeader.h"
 
-#define N_NODE 1                //Number of hart
-#define N_HART_INFO_OFFSET 3    //Number of entry in hart info node
+#define N_NODE 4  // changed to 4 cores.
+#define N_HART_INFO_OFFSET 3
+#define RHCT_ISA_STRING_LENGTH 1024
 
 #pragma pack (1)
 
@@ -16,13 +17,13 @@ typedef struct {
 } EFI_RHCT_NODE_HEADER;
 
 typedef struct {
-  UINT16                   NumOffsets;
-  UINT32                   Uid;
+  UINT16 NumOffsets;
+  UINT32 Uid;
 } EFI_RHCT_HART_INFO;
 
 typedef struct {
-  EFI_RHCT_NODE_HEADER     Header;
-  EFI_RHCT_HART_INFO       HartInfo;
+  EFI_RHCT_NODE_HEADER Header;
+  EFI_RHCT_HART_INFO   HartInfo;
 } EFI_RHCT_HART_INFO_STRUCT;
 
 typedef struct {
@@ -31,40 +32,40 @@ typedef struct {
 
 typedef struct {
   UINT16 IsaLength;
-  UINT8  IsaString[1024];    //Need to adjust array size based on IsaLength
+  UINT8  IsaString[RHCT_ISA_STRING_LENGTH];
 } EFI_RHCT_ISA_STRING;
 
 typedef struct {
-  UINT8  Reserved;
-  UINT8  CbomBlockSize;
-  UINT8  CbopBlockSize;
-  UINT8  CbozBlockSize;
+  UINT8 Reserved;
+  UINT8 CbomBlockSize;
+  UINT8 CbopBlockSize;
+  UINT8 CbozBlockSize;
 } EFI_RHCT_CMO;
 
 typedef struct {
-  UINT8  Reserved;
-  UINT8  MmuType;
+  UINT8 Reserved;
+  UINT8 MmuType;
 } EFI_RHCT_MMU;
 
 typedef struct {
-  EFI_RHCT_NODE_HEADER     Header;
-  EFI_RHCT_ISA_STRING      IsaData;
+  EFI_RHCT_NODE_HEADER Header;
+  EFI_RHCT_ISA_STRING  IsaData;
 } EFI_RHCT_ISA_STRING_STRUCT;
 
 typedef struct {
-  EFI_RHCT_NODE_HEADER     Header;
-  EFI_RHCT_CMO             CmoData;
+  EFI_RHCT_NODE_HEADER Header;
+  EFI_RHCT_CMO         CmoData;
 } EFI_RHCT_CMO_STRUCT;
 
 typedef struct {
-  EFI_RHCT_NODE_HEADER     Header;
-  EFI_RHCT_MMU             MmuData;
+  EFI_RHCT_NODE_HEADER Header;
+  EFI_RHCT_MMU         MmuData;
 } EFI_RHCT_MMU_STRUCT;
 
 typedef struct {
   EFI_RHCT_HART_INFO_STRUCT      HartInfo;
   EFI_RHCT_HART_NODE_INFO_OFFSET Offset;
-  EFI_RHCT_ISA_STRING_STRUCT     Isa_node;
+  EFI_RHCT_ISA_STRING_STRUCT     IsaNode;
   EFI_RHCT_CMO_STRUCT            CmoNode;
   EFI_RHCT_MMU_STRUCT            MmuNode;
 } EFI_RHCT_NODE_DATA;
@@ -77,118 +78,34 @@ typedef struct {
 } EFI_RHCT_HEADER_STRUCTURE;
 
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER    Header;
-  EFI_RHCT_HEADER_STRUCTURE      RhctHeader;
-  EFI_RHCT_NODE_DATA             Node[N_NODE];
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  EFI_RHCT_HEADER_STRUCTURE   RhctHeader;
+  EFI_RHCT_NODE_DATA          Node[N_NODE];
 } EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE;
 
 #pragma pack ()
 
+#define RHCT_NODE_BASE(_uid)  (sizeof (EFI_ACPI_DESCRIPTION_HEADER) +                                sizeof (EFI_RHCT_HEADER_STRUCTURE) +                                (sizeof (EFI_RHCT_NODE_DATA) * (_uid)))
+
+#define RHCT_NODE_INIT(_uid)  {   {     {       0xFFFF,       sizeof (EFI_RHCT_HART_INFO_STRUCT) +       sizeof (EFI_RHCT_HART_NODE_INFO_OFFSET) +       sizeof (EFI_RHCT_ISA_STRING_STRUCT),       1,     },     {       3,       (_uid),     },   },   {     {       RHCT_NODE_BASE (_uid) + sizeof (EFI_RHCT_HART_INFO_STRUCT) + sizeof (EFI_RHCT_HART_NODE_INFO_OFFSET),       RHCT_NODE_BASE (_uid) + sizeof (EFI_RHCT_HART_INFO_STRUCT) + sizeof (EFI_RHCT_HART_NODE_INFO_OFFSET) + sizeof (EFI_RHCT_ISA_STRING_STRUCT),       RHCT_NODE_BASE (_uid) + sizeof (EFI_RHCT_HART_INFO_STRUCT) + sizeof (EFI_RHCT_HART_NODE_INFO_OFFSET) + sizeof (EFI_RHCT_ISA_STRING_STRUCT) + sizeof (EFI_RHCT_CMO_STRUCT),     },   },   {     {       0,       sizeof (EFI_RHCT_NODE_HEADER) + sizeof (EFI_RHCT_ISA_STRING),       1     },     {       RHCT_ISA_STRING_LENGTH,       "rv64imafdcvh_sdring_sha_shcounternw_shgatpa_shlcofideleg_shtvala_shvsatpa_shvstvala_shvstvecd_smaia_smcsrind_smdbltrp_smmpm_smnpm_smrnmi_smstateen_sspl13_ssaia_ssccptr_ssconfpmf_sscounterenw_sscsrind_ssdbltrp_ssnpm_sspm_ssstateen_ssstrict_sstc_sstvala_sstvecd_ssu64xl_supm_svade_svbare_svinval_svnapot_za64rs_zacas_zawrs_zba_zbb_zbc_zbkb_zbkc_zbkx_zbs_zcb_zcmop_zfa_zfh_zfhmin_zic64b_zicbom_zicbop_zicboz_ziccamoa_ziccif_zicclsm_ziccrse_zicntr_zicond_zicsr_zifencei_zihintntl_zihintpause_zihpm_zimop_zkn_zknd_zkne_zknh_zksed_zksh_zkt_zvbb_zvfn_zvfhmin_zvkt_zv1128b_zv132b_zv164b",     },   },   {     {       1,       sizeof (EFI_RHCT_CMO_STRUCT),       1     },     {       0,       64,       64,       64     },   },   {     {       2,       sizeof (EFI_RHCT_MMU_STRUCT),       1     },     {       0,       1     },   } }
+
 EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE Rhct = {
-  /*EFI_ACPI_DESCRIPTION_HEADER*/
   ACPI_HEADER (
     EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_SIGNATURE,
     EFI_ACPI_6_0_RHCT_DESCRIPTION_TABLE,
     EFI_ACPI_6_0_MULTIPLE_RHCT_DESCRIPTION_TABLE_REVISION
   ),
-  /*EFI_RHCT_HEADER_STRUCTURE*/
   {
-    0,                    // Reserved
-    500000,               // BaseFrequency
-    2,                    // NodeNumber
-    56                    // NodeOffset -- the offset from the start of the table to the first node
+    0,
+    1000000,
+    N_NODE,
+    sizeof (EFI_ACPI_DESCRIPTION_HEADER) + sizeof (EFI_RHCT_HEADER_STRUCTURE)
   },
-  /*EFI_RHCT_NODE_DATA*/
   {
-    /*HART[0]*/
-    {
-      /*EFI_RHCT_HART_INFO_STRUCT*/
-      {
-        /*EFI_RHCT_NODE_HEADER*/
-        {
-          0xFFFF,                                           //Type 0xFFFF -> hart info
-          sizeof(EFI_RHCT_HART_INFO_STRUCT) +
-	  sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET) +
-	  sizeof(EFI_RHCT_ISA_STRING_STRUCT),               //Length
-          1,                                                //Revision
-        },
-        /*EFI_RHCT_HART_INFO*/
-        {
-          3,                                                //NumberOffsets
-          0,                                                //Uid
-        },
-      },
-      /*EFI_RHCT_HART_NODE_INFO_OFFSET*/
-      {
-        {
-          /*Offset[0] -- the offset from the start of the table to this node entry*/
-          sizeof(EFI_ACPI_DESCRIPTION_HEADER) +
-          sizeof(EFI_RHCT_HEADER_STRUCTURE) +
-	  sizeof(EFI_RHCT_NODE_DATA) * 0 +
-	  sizeof(EFI_RHCT_HART_INFO_STRUCT) +
-          sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET),
-
-	  /*Offset[1] -- cmo offset*/
-          sizeof(EFI_ACPI_DESCRIPTION_HEADER) +
-          sizeof(EFI_RHCT_HEADER_STRUCTURE) +
-	  sizeof(EFI_RHCT_NODE_DATA) * 0 +
-	  sizeof(EFI_RHCT_HART_INFO_STRUCT) +
-          sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET) +
-          sizeof(EFI_RHCT_ISA_STRING_STRUCT),
-
-	  /*Offset[2] -- mmu offset*/
-          sizeof(EFI_ACPI_DESCRIPTION_HEADER) +
-          sizeof(EFI_RHCT_HEADER_STRUCTURE) +
-	  sizeof(EFI_RHCT_NODE_DATA) * 0 +
-	  sizeof(EFI_RHCT_HART_INFO_STRUCT) +
-          sizeof(EFI_RHCT_HART_NODE_INFO_OFFSET) +
-          sizeof(EFI_RHCT_ISA_STRING_STRUCT) +
-          sizeof(EFI_RHCT_CMO_STRUCT)
-	},
-      },
-      /*EFI_RHCT_ISA_STRING_STRUCT*/
-      {
-        /*EFI_RHCT_NODE_HEADER*/
-        {
-          0,                                                           //Type 0x0000 -> isa string
-          sizeof(EFI_RHCT_NODE_HEADER) + sizeof(EFI_RHCT_ISA_STRING),  //Length
-          1                                                            //Revision
-        },
-        /*EFI_RHCT_ISA_STRING*/
-        {
-          1024,                                                        //length of isa string
-	  "rv64imafdcvh_sdring_sha_shcounternw_shgatpa_shlcofideleg_shtvala_shvsatpa_shvstvala_shvstvecd_smaia_smcsrind_smdbltrp_smmpm_smnpm_smrnmi_smstateen_sspl13_ssaia_ssccptr_ssconfpmf_sscounterenw_sscsrind_ssdbltrp_ssnpm_sspm_ssstateen_ssstrict_sstc_sstvala_sstvecd_ssu64xl_supm_svade_svbare_svinval_svnapot_svpbmt_za64rs_zacas_zawrs_zba_zbb_zbc_zbkb_zbkc_zbkx_zbs_zcb_zcmop_zfa_zfh_zfhmin_zic64b_zicbom_zicbop_zicboz_ziccamoa_ziccif_zicclsm_ziccrse_zicntr_zicond_zicsr_zifencei_zihintntl_zihintpause_zihpm_zimop_zkn_zknd_zkne_zknh_zksed_zksh_zkt_zvbb_zvfn_zvfhmin_zvkt_zv1128b_zv132b_zv164b",                                        //isa string
-        },
-      },
-      /*EFI_RHCT_CMO_STRUCT*/
-      {
-        /*EFI_RHCT_NODE_HEADER*/
-        {
-          1,                                                           //Type 1 -> Cmo type
-          sizeof(EFI_RHCT_CMO_STRUCT),                                 //Length
-          1                                                            //Revision
-        },
-        /*EFI_RHCT_CMO_STRUCT*/
-        {
-          0,
-          64,
-          64,
-          64
-        },
-      },
-      /*EFI_RHCT_MMU_STRUCT*/
-      {
-        {
-          2,                                                           //Type 1 -> Cmo type
-          sizeof(EFI_RHCT_MMU_STRUCT),                                 //Length
-          1                                                            //Revision
-        },
-        {
-          0,
-          1
-        },
-      },
-    },
+    RHCT_NODE_INIT (0),
+    RHCT_NODE_INIT (1),
+    RHCT_NODE_INIT (2),
+    RHCT_NODE_INIT (3),
   },
 };
 

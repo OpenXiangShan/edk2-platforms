@@ -433,10 +433,10 @@
   }
 
   ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
-#  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf {
-#    <LibraryClasses>
-#      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-#  }
+  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf {
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  }
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf

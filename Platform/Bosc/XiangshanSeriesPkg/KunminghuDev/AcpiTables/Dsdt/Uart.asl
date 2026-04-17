@@ -20,7 +20,7 @@ Device (COM0)
         ToUUID ("daffd814-6eba-4d8c-8a91-bc9bbf4aa301") /* Device Properties for _DSD */, 
         Package ()
         {
-            Package (0x02) {"clock-frequency", 0x50000000},
+            Package (0x02) {"clock-frequency", 50000000},
             Package (0x02) {"reg-shift", 2},
             Package (0x02) {"reg-io-width", 4},
             Package (0x02) {"current-speed", 115200},
