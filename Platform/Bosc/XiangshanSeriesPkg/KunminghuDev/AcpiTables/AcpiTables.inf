@@ -8,6 +8,9 @@
 [Sources]
   Fadt.aslc
   Dsdt/Dsdt.asl
+  einj.asl
+  hest.asl
+  erst.asl
   Madt.aslc
   Rhct.aslc
 
