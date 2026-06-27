@@ -13,11 +13,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 #include <IndustryStandard/Bmp.h>
+#include <IndustryStandard/Virtio095.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/BootLogo.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/VirtioDevice.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

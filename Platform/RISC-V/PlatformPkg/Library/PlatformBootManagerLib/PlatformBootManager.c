@@ -14,6 +14,368 @@ EFI_GUID  mUefiShellFileGuid = {
   0x7C04A583, 0x9E3E, 0x4f1c, { 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 };
 
+typedef struct {
+  EFI_GUID       FileGuid;
+  CONST CHAR8    *Name;
+} PLATFORM_FV_DRIVER;
+
+STATIC CONST PLATFORM_FV_DRIVER  mConsoleDrivers[] = {
+  {
+    { 0xD6099B94, 0xCD97, 0x4CC5, { 0x87, 0x14, 0x7F, 0x63, 0x12, 0x70, 0x1A, 0x8A } },
+    "VirtioGpuDxe"
+  },
+  {
+    { 0xCCCB0C28, 0x4B24, 0x11D5, { 0x9A, 0x5A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D } },
+    "GraphicsConsoleDxe"
+  },
+  {
+    { 0x737F7F4B, 0xD375, 0x4B19, { 0xB7, 0x5F, 0xEA, 0x9E, 0x5D, 0x6B, 0x27, 0x2B } },
+    "VirtioInputDxe"
+  }
+};
+
+STATIC CONST PLATFORM_FV_DRIVER  mNetworkDrivers[] = {
+  {
+    { 0x025BBFC7, 0xE6A9, 0x4B8B, { 0x82, 0xAD, 0x68, 0x15, 0xA1, 0xAE, 0xAF, 0x4A } },
+    "MnpDxe"
+  },
+  {
+    { 0x529D3F93, 0xE8E9, 0x4E73, { 0xB1, 0xE1, 0xBD, 0xF6, 0xA9, 0xD5, 0x01, 0x13 } },
+    "ArpDxe"
+  },
+  {
+    { 0x9FB1A1F3, 0x3B71, 0x4324, { 0xB3, 0x9A, 0x74, 0x5C, 0xBB, 0x01, 0x5F, 0xFF } },
+    "Ip4Dxe"
+  },
+  {
+    { 0x6D6963AB, 0x906D, 0x4A65, { 0xA7, 0xCA, 0xBD, 0x40, 0xE5, 0xD6, 0xAF, 0x2B } },
+    "Udp4Dxe"
+  },
+  {
+    { 0x94734718, 0x0BBC, 0x47FB, { 0x96, 0xA5, 0xEE, 0x7A, 0x5A, 0xE6, 0xA2, 0xAD } },
+    "Dhcp4Dxe"
+  }
+};
+
+STATIC CONST ACPI_HID_DEVICE_PATH  mVirtioSerialPort0Node = {
+  {
+    ACPI_DEVICE_PATH,
+    ACPI_DP,
+    {
+      (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+      (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
+    },
+  },
+  EISA_PNP_ID (0x0501),
+  0
+};
+
+STATIC CONST UART_DEVICE_PATH  mVirtioSerialUartNode = {
+  {
+    MESSAGING_DEVICE_PATH,
+    MSG_UART_DP,
+    {
+      (UINT8)(sizeof (UART_DEVICE_PATH)),
+      (UINT8)((sizeof (UART_DEVICE_PATH)) >> 8)
+    },
+  },
+  0,
+  115200,
+  8,
+  1,
+  1
+};
+
+STATIC CONST VENDOR_DEVICE_PATH  mVirtioSerialTerminalNode = {
+  {
+    MESSAGING_DEVICE_PATH,
+    MSG_VENDOR_DP,
+    {
+      (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+      (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+    },
+  },
+  DEVICE_PATH_MESSAGING_PC_ANSI
+};
+
+STATIC
+VOID
+PlatformBootManagerAddVirtioConsole (
+  IN EFI_HANDLE  Handle
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *OldDevicePath;
+
+  DevicePath = DevicePathFromHandle (Handle);
+  if (DevicePath == NULL) {
+    return;
+  }
+
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&mVirtioSerialPort0Node
+                 );
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    (EFI_DEVICE_PATH_PROTOCOL *)&mVirtioSerialUartNode
+                    );
+  FreePool (OldDevicePath);
+
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    (EFI_DEVICE_PATH_PROTOCOL *)&mVirtioSerialTerminalNode
+                    );
+  FreePool (OldDevicePath);
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  DEBUG ((DEBUG_INFO, "Virtio CONSOLE_IN variable set %s : %r\n", ConvertDevicePathToText (DevicePath, FALSE, FALSE), Status));
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  DEBUG ((DEBUG_INFO, "Virtio CONSOLE_OUT variable set %s : %r\n", ConvertDevicePathToText (DevicePath, FALSE, FALSE), Status));
+
+  Status = EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
+  DEBUG ((DEBUG_INFO, "Virtio STD_ERROR variable set %s : %r\n", ConvertDevicePathToText (DevicePath, FALSE, FALSE), Status));
+
+  FreePool (DevicePath);
+}
+
+STATIC
+VOID
+PlatformBootManagerDetectVirtioConsoles (
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   HandleCount;
+  EFI_HANDLE              *HandleBuffer;
+  UINTN                   Index;
+  VIRTIO_DEVICE_PROTOCOL  *VirtIo;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gVirtioDeviceProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gVirtioDeviceProtocolGuid,
+                    (VOID **)&VirtIo
+                    );
+    if (!EFI_ERROR (Status) &&
+        (VirtIo->SubSystemDeviceId == VIRTIO_SUBSYSTEM_CONSOLE))
+    {
+      PlatformBootManagerAddVirtioConsole (HandleBuffer[Index]);
+    }
+  }
+
+  FreePool (HandleBuffer);
+}
+
+STATIC
+BOOLEAN
+PlatformBootManagerFvDriverIsLoaded (
+  IN CONST EFI_GUID  *FileGuid
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            HandleCount;
+  EFI_HANDLE                       *HandleBuffer;
+  UINTN                            Index;
+  EFI_LOADED_IMAGE_PROTOCOL        *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL         *Node;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFileNode;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiLoadedImageProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
+    if (EFI_ERROR (Status) || (LoadedImage->FilePath == NULL)) {
+      continue;
+    }
+
+    for (Node = LoadedImage->FilePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+      if ((DevicePathType (Node) == MEDIA_DEVICE_PATH) &&
+          (DevicePathSubType (Node) == MEDIA_PIWG_FW_FILE_DP) &&
+          (DevicePathNodeLength (Node) == sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH)))
+      {
+        FvFileNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)Node;
+        if (CompareGuid (&FvFileNode->FvFileName, FileGuid)) {
+          FreePool (HandleBuffer);
+          return TRUE;
+        }
+      }
+    }
+  }
+
+  FreePool (HandleBuffer);
+  return FALSE;
+}
+
+STATIC
+EFI_STATUS
+PlatformBootManagerStartFvDriver (
+  IN CONST EFI_GUID  *FileGuid,
+  IN CONST CHAR8     *Name
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_HANDLE                         ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+
+  if (PlatformBootManagerFvDriverIsLoaded (FileGuid)) {
+    DEBUG ((DEBUG_INFO, "%a is already loaded, skip FV start\n", Name));
+    return EFI_ALREADY_STARTED;
+  }
+
+  Status = gBS->HandleProtocol (
+                  gImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  EfiInitializeFwVolDevicepathNode (&FileNode, (EFI_GUID *)FileGuid);
+  DevicePath = AppendDevicePathNode (
+                 DevicePathFromHandle (LoadedImage->DeviceHandle),
+                 (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
+                 );
+  if (DevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->LoadImage (
+                  FALSE,
+                  gImageHandle,
+                  DevicePath,
+                  NULL,
+                  0,
+                  &ImageHandle
+                  );
+  FreePool (DevicePath);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Load %a from FV failed: %r\n", Name, Status));
+    return Status;
+  }
+
+  Status = gBS->StartImage (ImageHandle, NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    gBS->UnloadImage (ImageHandle);
+    DEBUG ((DEBUG_ERROR, "Start %a failed: %r\n", Name, Status));
+  } else {
+    DEBUG ((DEBUG_INFO, "Start %a: %r\n", Name, Status));
+  }
+
+  return Status;
+}
+
+STATIC
+VOID
+PlatformBootManagerStartNetworkDrivers (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < ARRAY_SIZE (mNetworkDrivers); Index++) {
+    PlatformBootManagerStartFvDriver (
+      &mNetworkDrivers[Index].FileGuid,
+      mNetworkDrivers[Index].Name
+      );
+  }
+}
+
+STATIC
+VOID
+PlatformBootManagerStartConsoleDrivers (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < ARRAY_SIZE (mConsoleDrivers); Index++) {
+    PlatformBootManagerStartFvDriver (
+      &mConsoleDrivers[Index].FileGuid,
+      mConsoleDrivers[Index].Name
+      );
+  }
+}
+
+STATIC
+VOID
+PlatformBootManagerAddHandlesToConsole (
+  IN EFI_GUID             *ProtocolGuid,
+  IN CONSOLE_TYPE         ConsoleType,
+  IN CONST CHAR8          *Name
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     HandleCount;
+  EFI_HANDLE                *HandleBuffer;
+  UINTN                     Index;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  ProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    DevicePath = DevicePathFromHandle (HandleBuffer[Index]);
+    if (DevicePath == NULL) {
+      continue;
+    }
+
+    Status = EfiBootManagerUpdateConsoleVariable (
+               ConsoleType,
+               DevicePath,
+               NULL
+               );
+    DEBUG ((
+      DEBUG_INFO,
+      "%a console variable set %s : %r\n",
+      Name,
+      ConvertDevicePathToText (DevicePath, FALSE, FALSE),
+      Status
+      ));
+  }
+
+  FreePool (HandleBuffer);
+}
+
 /**
   Perform the platform diagnostic, such like test memory. OEM/IBV also
   can customize this function to support specific platform diagnostic.
@@ -190,6 +552,26 @@ PlatformBootManagerBeforeConsole (
     }
   }
 
+  PlatformBootManagerStartConsoleDrivers ();
+  EfiBootManagerConnectAll ();
+  PlatformBootManagerAddHandlesToConsole (
+    &gEfiGraphicsOutputProtocolGuid,
+    ConOut,
+    "GOP CONSOLE_OUT"
+    );
+  PlatformBootManagerAddHandlesToConsole (
+    &gEfiGraphicsOutputProtocolGuid,
+    ErrOut,
+    "GOP STD_ERROR"
+    );
+  PlatformBootManagerAddHandlesToConsole (
+    &gEfiSimpleTextInProtocolGuid,
+    ConIn,
+    "SimpleTextIn CONSOLE_IN"
+    );
+
+  PlatformBootManagerDetectVirtioConsoles ();
+
   //
   // Register ENTER as CONTINUE key
   //
@@ -230,6 +612,8 @@ PlatformBootManagerAfterConsole (
 
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
+
+  PlatformBootManagerStartNetworkDrivers ();
 
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();
