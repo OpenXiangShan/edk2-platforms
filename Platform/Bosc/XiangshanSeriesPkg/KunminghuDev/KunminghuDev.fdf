@@ -70,6 +70,7 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntim
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
 INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+INF  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
 INF  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -97,6 +98,7 @@ INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDx
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
 INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
@@ -104,6 +106,11 @@ INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+INF  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+INF  OvmfPkg/VirtioInputDxe/VirtioInput.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf

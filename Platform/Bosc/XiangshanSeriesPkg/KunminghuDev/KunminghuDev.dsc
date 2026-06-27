@@ -98,9 +98,12 @@
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
@@ -438,6 +441,8 @@
     <LibraryClasses>
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   }
+  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -500,10 +505,10 @@
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 
   # No graphic console supported yet.
-  #  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf {
-  #    <LibraryClasses>
-  #      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  #  }
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf {
     <LibraryClasses>
@@ -514,6 +519,11 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+  OvmfPkg/VirtioInputDxe/VirtioInput.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
