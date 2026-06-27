@@ -271,6 +271,7 @@
   # XILINX PCI Root Complex
   #
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x40000000
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x50000000
@@ -458,6 +459,7 @@
   }
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
+  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/TimerRngDxe/TimerRngDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf {
     <LibraryClasses>
