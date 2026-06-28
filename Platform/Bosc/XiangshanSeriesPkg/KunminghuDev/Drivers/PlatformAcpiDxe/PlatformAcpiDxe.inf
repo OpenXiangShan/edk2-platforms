@@ -26,6 +26,7 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   DxeServicesLib
   AcpiLib
@@ -36,8 +37,10 @@
 [Guids]
 
 [Protocols]
+  gEfiAcpiTableProtocolGuid
+  gFdtClientProtocolGuid
 
 [Pcd]
 
 [Depex]
-  gEfiAcpiTableProtocolGuid
+  gEfiAcpiTableProtocolGuid AND gFdtClientProtocolGuid
