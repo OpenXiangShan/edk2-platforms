@@ -125,6 +125,7 @@ PlatformPeimInitialization (
 
   PopulateIoResources (Base, "bitmain,bm-sd");
   PopulateIoResources (Base, "snps,dw-apb-uart");
+  PopulateIoResources (Base, "ns16550a");
 
   return EFI_SUCCESS;
 }
