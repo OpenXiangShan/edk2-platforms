@@ -28,10 +28,6 @@ FV = FVMAIN_COMPACT
 
 !include VarStore.fdf.inc
 
-$(KERNEL_OFFSET)|$(KERNEL_SIZE)
-gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
-FILE = edk2-platforms/Silicon/Bosc/KunMingHuPkg/Application/LoaderTool/Image
-
 ################################################################################
 
 [FV.DXEFV]

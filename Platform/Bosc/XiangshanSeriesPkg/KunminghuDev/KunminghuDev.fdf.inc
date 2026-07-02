@@ -34,12 +34,6 @@ DEFINE FVMAIN_OFFSET                 = 0x00000000
 DEFINE FVMAIN_SIZE                   = 0x00780000
 
 #
-# Kernel memory Region
-#
-DEFINE KERNEL_OFFSET                 = 0x00a00000
-DEFINE KERNEL_SIZE                   = 0x3000000
-
-#
 # EFI Variable memory region.
 # The total size of EFI Variable FD must include
 # all of sub regions of EFI Variable
