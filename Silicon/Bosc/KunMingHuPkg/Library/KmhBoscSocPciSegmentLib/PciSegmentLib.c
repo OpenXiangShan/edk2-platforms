@@ -20,19 +20,6 @@
 #define KMH_BOSC_PCIE_MAX_SEGMENTS          12
 #define KMH_BOSC_PCIE_COMPATIBLE            "snps,dw-pcie"
 
-#define DW_PCIE_ATU_VIEWPORT                0x900
-#define DW_PCIE_ATU_CR1                     0x904
-#define DW_PCIE_ATU_CR2                     0x908
-#define DW_PCIE_ATU_ENABLE                  BIT31
-#define DW_PCIE_ATU_TYPE_CFG                0x4
-#define DW_PCIE_ATU_LOWER_BASE              0x90c
-#define DW_PCIE_ATU_UPPER_BASE              0x910
-#define DW_PCIE_ATU_LIMIT                   0x914
-#define DW_PCIE_ATU_LOWER_TARGET            0x918
-#define DW_PCIE_ATU_UPPER_TARGET            0x91c
-
-#define DW_PCIE_CFG_VIEWPORT                0
-
 typedef struct {
   UINT32  Segment;
   UINT64  DbiBase;
@@ -279,34 +266,6 @@ KmhBoscFindPcieSegment (
 }
 
 STATIC
-VOID
-KmhBoscProgramCfgAtu (
-  IN KMH_BOSC_PCIE_SEGMENT_INFO  *Info,
-  IN UINT8                       Bus,
-  IN UINT8                       DevFunc
-  )
-{
-  UINT64  Limit;
-  UINT64  Target;
-
-  if (Info->CfgBase > MAX_UINT64 - Info->CfgSize) {
-    return;
-  }
-
-  Limit = Info->CfgBase + Info->CfgSize - 1;
-  Target = LShiftU64 (Bus, 24) | LShiftU64 (DevFunc, 16);
-
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_VIEWPORT, DW_PCIE_CFG_VIEWPORT);
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_LOWER_BASE, (UINT32)Info->CfgBase);
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_UPPER_BASE, (UINT32)(Info->CfgBase >> 32));
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_LIMIT, (UINT32)Limit);
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_LOWER_TARGET, (UINT32)Target);
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_UPPER_TARGET, (UINT32)(Target >> 32));
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_CR1, DW_PCIE_ATU_TYPE_CFG);
-  MmioWrite32 (Info->DbiBase + DW_PCIE_ATU_CR2, DW_PCIE_ATU_ENABLE);
-}
-
-STATIC
 UINT64
 PciSegmentLibGetConfigAddress (
   IN UINT64  Address
@@ -318,7 +277,7 @@ PciSegmentLibGetConfigAddress (
   UINT32                      Device;
   UINT32                      Function;
   UINT32                      Register;
-  UINT8                       DevFunc;
+  UINT64                      Offset;
 
   Segment = (UINT32)((Address >> 32) & 0xffff);
   EXTRACT_PCIE_ADDRESS (Address, Bus, Device, Function);
@@ -329,21 +288,15 @@ PciSegmentLibGetConfigAddress (
     return MAX_UINT64;
   }
 
-  if ((Bus == 0) && (Device == 0) && (Function == 0)) {
-    if (Register >= Info->DbiSize) {
-      return MAX_UINT64;
-    }
-
-    return Info->DbiBase + Register;
-  }
-
-  if (Register >= Info->CfgSize) {
+  Offset = LShiftU64 (Bus, 20) |
+           LShiftU64 (Device, 15) |
+           LShiftU64 (Function, 12) |
+           Register;
+  if (Offset >= Info->CfgSize) {
     return MAX_UINT64;
   }
 
-  DevFunc = (UINT8)((Device << 3) | Function);
-  KmhBoscProgramCfgAtu (Info, (UINT8)Bus, DevFunc);
-  return Info->CfgBase + Register;
+  return Info->CfgBase + Offset;
 }
 
 /**

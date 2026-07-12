@@ -21,9 +21,9 @@ CpuPeimInitialization (
   )
 {
   //
-  // for MMU type >= sv39
+  // Cover KmhBoscSoc die3 PCIe ECAM/MMIO windows below 2^46.
   //
-  BuildCpuHob (40, 39);
+  BuildCpuHob (46, 39);
 
   return EFI_SUCCESS;
 }

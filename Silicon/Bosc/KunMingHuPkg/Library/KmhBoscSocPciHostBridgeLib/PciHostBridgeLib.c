@@ -41,8 +41,6 @@
 #define DW_PCIE_MEM32_VIEWPORT              1
 #define DW_PCIE_MEM64_VIEWPORT              2
 
-#define KMH_BOSC_UEFI_PCIE_MMIO_BASE        0x50000000ULL
-#define KMH_BOSC_UEFI_PCIE_ROOT_STRIDE      0x04000000ULL
 #define KMH_BOSC_UEFI_PCIE_WINDOW_SIZE      0x02000000ULL
 
 #pragma pack(1)
@@ -195,18 +193,6 @@ KmhBoscUnavailableAperture (
 
 STATIC
 UINT64
-KmhBoscUefiCpuWindowBase (
-  IN UINT32   Segment,
-  IN BOOLEAN  Above4G
-  )
-{
-  return KMH_BOSC_UEFI_PCIE_MMIO_BASE +
-         Segment * KMH_BOSC_UEFI_PCIE_ROOT_STRIDE +
-         (Above4G ? KMH_BOSC_UEFI_PCIE_WINDOW_SIZE : 0);
-}
-
-STATIC
-UINT64
 KmhBoscClampUefiWindowSize (
   IN UINT64  Size
   )
@@ -303,7 +289,7 @@ KmhBoscParsePcieNode (
   INT32         RangeEntryCells;
   UINT32        RangeType;
   UINT64        ChildBase;
-  UINT64        UefiCpuBase;
+  UINT64        ParentBase;
   UINT64        Size;
   UINT64        WindowSize;
 
@@ -378,23 +364,24 @@ KmhBoscParsePcieNode (
     ChildBase = ((UINT64)fdt32_to_cpu (Cells[1]) << 32) |
                 fdt32_to_cpu (Cells[2]);
     Cells += AddressCells;
-    KmhBoscReadFdtCells (&Cells, ParentAddressCells);
+    ParentBase = KmhBoscReadFdtCells (&Cells, ParentAddressCells);
     Size = KmhBoscReadFdtCells (&Cells, RangeSizeCells);
     WindowSize = KmhBoscClampUefiWindowSize (Size);
-    if ((WindowSize == 0) || (ChildBase > MAX_UINT64 - WindowSize)) {
+    if ((WindowSize == 0) ||
+        (ChildBase > MAX_UINT64 - WindowSize) ||
+        (ParentBase > MAX_UINT64 - WindowSize))
+    {
       continue;
     }
 
     if (RangeType == FDT_PCI_RANGE_MMIO) {
-      UefiCpuBase = KmhBoscUefiCpuWindowBase (Root->Segment, FALSE);
       Root->Mem.Base = ChildBase;
       Root->Mem.Limit = ChildBase + WindowSize - 1;
-      Root->Mem.Translation = ChildBase - UefiCpuBase;
+      Root->Mem.Translation = ChildBase - ParentBase;
     } else if (RangeType == FDT_PCI_RANGE_MMIO_64BIT) {
-      UefiCpuBase = KmhBoscUefiCpuWindowBase (Root->Segment, TRUE);
       Root->MemAbove4G.Base = ChildBase;
       Root->MemAbove4G.Limit = ChildBase + WindowSize - 1;
-      Root->MemAbove4G.Translation = ChildBase - UefiCpuBase;
+      Root->MemAbove4G.Translation = ChildBase - ParentBase;
     }
   }
 

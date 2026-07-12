@@ -13,6 +13,7 @@
   Spcr.aslc
   Srat.aslc
   Slit.aslc
+  Mcfg.aslc
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec

@@ -1,0 +1,68 @@
+/** @file
+*  PCI Express Memory-mapped Configuration Space base address description table
+*  for the BOSC Kunminghu multi-die SoC.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+**/
+
+#include <Library/AcpiLib.h>
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include "AcpiHeader.h"
+
+#define MCFG_VERSION  0x1
+
+#pragma pack (1)
+
+typedef struct {
+  UINT64 BaseAddress;
+  UINT16 SegGroupNum;
+  UINT8  StartBusNum;
+  UINT8  EndBusNum;
+  UINT32 Reserved2;
+} EFI_MCFG_CONFIG_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  UINT64 Reserved1;
+} EFI_MCFG_TABLE_CONFIG;
+
+typedef struct {
+  EFI_MCFG_TABLE_CONFIG   AcpiTableMcfg;
+  EFI_MCFG_CONFIG_STRUCTURE ConfigStructure[12];
+} EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+
+#pragma pack ()
+
+EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg = {
+  {
+    {
+      EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+      MCFG_VERSION,
+      0x00,
+      EFI_ACPI_OEM_ID,
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+    EFI_ACPI_RESERVED_QWORD,
+  },
+  {
+    { 0x0000004800000000,  0, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000004900000000,  1, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000004A00000000,  2, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000104800000000,  3, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000104900000000,  4, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000104A00000000,  5, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000204800000000,  6, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000204900000000,  7, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000204A00000000,  8, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000304800000000,  9, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000304900000000, 10, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+    { 0x0000304A00000000, 11, 0, 0xFF, EFI_ACPI_RESERVED_DWORD },
+  }
+};
+
+VOID* CONST ReferenceAcpiTable = &Mcfg;
