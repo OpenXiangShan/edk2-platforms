@@ -14,6 +14,7 @@ Module Name:
 **/
 
 #include <PiPei.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -131,6 +132,68 @@ GetNumCells (
   return (INT32)Val;
 }
 
+STATIC
+UINT64
+ReadFdtCells (
+  IN OUT CONST UINT32  **Cells,
+  IN     INT32         NumCells
+  )
+{
+  UINT64  Value;
+  INT32   Index;
+
+  Value = 0;
+  for (Index = 0; Index < NumCells; Index++) {
+    Value = (Value << 32) | fdt32_to_cpu ((*Cells)[Index]);
+  }
+
+  *Cells += NumCells;
+  return Value;
+}
+
+STATIC
+BOOLEAN
+IsMemoryNode (
+  IN VOID   *Fdt,
+  IN INT32  Node
+  )
+{
+  CONST CHAR8  *Type;
+  INT32        Len;
+
+  Type = fdt_getprop (Fdt, Node, "device_type", &Len);
+  return (Type != NULL) && (AsciiStrCmp (Type, "memory") == 0);
+}
+
+STATIC
+BOOLEAN
+GetParentAddressSizeCells (
+  IN  VOID   *Fdt,
+  IN  INT32  Node,
+  OUT INT32  *AddressCells,
+  OUT INT32  *SizeCells
+  )
+{
+  INT32  Parent;
+
+  Parent = fdt_parent_offset (Fdt, Node);
+  if (Parent < 0) {
+    Parent = 0;
+  }
+
+  *AddressCells = GetNumCells (Fdt, Parent, "#address-cells");
+  if (*AddressCells <= 0) {
+    *AddressCells = 2;
+  }
+
+  *SizeCells = GetNumCells (Fdt, Parent, "#size-cells");
+  if (*SizeCells <= 0) {
+    *SizeCells = 1;
+  }
+
+  return (*AddressCells > 0) && (*SizeCells > 0);
+}
+
 /** Mark reserved memory ranges in the EFI memory map
 
  * As per DT spec v0.4 Section 3.5.4,
@@ -245,75 +308,143 @@ MemoryPeimInitialization (
   IN  VOID  *DeviceTreeAddress
   )
 {
-  CONST UINT64                *RegProp;
-  CONST CHAR8                 *Type;
+  CONST UINT32                *RegProp;
+  CONST UINT32                *Cells;
   UINT64                      UefiMemoryBase;
   UINT64                      CurBase;
   UINT64                      CurSize;
+  UINT64                      CurEnd;
+  UINT64                      PublishBase;
+  UINT64                      PublishSize;
   UINT64                      LowestMemBase;
-  UINT64                      LowestMemSize;
   INT32                       Node;
   INT32                       Prev;
   INT32                       Len;
+  INT32                       AddressCells;
+  INT32                       SizeCells;
+  INT32                       EntryCells;
+  INT32                       EntrySize;
+  INT32                       Index;
+  INT32                       Entries;
+  BOOLEAN                     FoundMemory;
+  BOOLEAN                     PublishedMemory;
 
   UefiMemoryBase = (UINT64)FixedPcdGet32 (PcdTemporaryRamBase) + FixedPcdGet32 (PcdTemporaryRamSize) - SIZE_32MB;
-  LowestMemBase = 0;
-  LowestMemSize = 0;
+  LowestMemBase = MAX_UINT64;
+  FoundMemory = FALSE;
 
-  // Look for the lowest memory node
+  // Find the boot memory node. Only this node is cropped for the UEFI image.
   for (Prev = 0; ; Prev = Node) {
     Node = fdt_next_node (DeviceTreeAddress, Prev, NULL);
     if (Node < 0) {
       break;
     }
 
-    // Check for memory node
-    Type = fdt_getprop (DeviceTreeAddress, Node, "device_type", &Len);
-    if (Type && (AsciiStrnCmp (Type, "memory", Len) == 0)) {
-      // Get the 'reg' property of this node. For now, we will assume
-      // two 8 byte quantities for base and size, respectively.
-      RegProp = fdt_getprop (DeviceTreeAddress, Node, "reg", &Len);
-      if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-        CurBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-        CurSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
+    if (!IsMemoryNode (DeviceTreeAddress, Node)) {
+      continue;
+    }
 
-        DEBUG ((
-          DEBUG_INFO,
-          "%a: System RAM @ 0x%lx - 0x%lx\n",
-          __func__,
-          CurBase,
-          CurBase + CurSize - 1
-          ));
+    if (!GetParentAddressSizeCells (DeviceTreeAddress, Node, &AddressCells, &SizeCells)) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid FDT memory parent cells\n", __func__));
+      continue;
+    }
 
-        if ((LowestMemBase == 0) || (CurBase <= LowestMemBase)) {
-          LowestMemBase = CurBase;
-          LowestMemSize = CurSize;
-        }
+    EntryCells = AddressCells + SizeCells;
+    EntrySize = EntryCells * sizeof (UINT32);
+    RegProp = fdt_getprop (DeviceTreeAddress, Node, "reg", &Len);
+    if ((RegProp == NULL) || (Len <= 0) || ((Len % EntrySize) != 0)) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to parse FDT memory node\n", __func__));
+      continue;
+    }
 
-      } else {
-        DEBUG ((
-          DEBUG_ERROR,
-          "%a: Failed to parse FDT memory node\n",
-          __func__
-          ));
+    Cells = RegProp;
+    Entries = Len / EntrySize;
+    for (Index = 0; Index < Entries; Index++) {
+      CurBase = ReadFdtCells (&Cells, AddressCells);
+      CurSize = ReadFdtCells (&Cells, SizeCells);
+      if ((CurSize == 0) || (CurBase > MAX_UINT64 - CurSize)) {
+        continue;
+      }
+
+      if (CurBase < LowestMemBase) {
+        LowestMemBase = CurBase;
+        FoundMemory = TRUE;
       }
     }
   }
 
-  if (UefiMemoryBase > LowestMemBase) {
-    LowestMemSize -= (UefiMemoryBase - LowestMemBase);
-    LowestMemBase = UefiMemoryBase;
+  if (!FoundMemory) {
+    DEBUG ((DEBUG_ERROR, "%a: no usable FDT memory node found\n", __func__));
+    return EFI_NOT_FOUND;
   }
 
-  DEBUG ((
-    DEBUG_INFO,
-    "%a: Total System RAM @ 0x%lx - 0x%lx\n",
-    __func__,
-    LowestMemBase,
-    LowestMemBase + LowestMemSize - 1
-    ));
+  PublishedMemory = FALSE;
+  for (Prev = 0; ; Prev = Node) {
+    Node = fdt_next_node (DeviceTreeAddress, Prev, NULL);
+    if (Node < 0) {
+      break;
+    }
 
-  InitializeRamRegions (LowestMemBase, LowestMemSize);
+    if (!IsMemoryNode (DeviceTreeAddress, Node)) {
+      continue;
+    }
+
+    if (!GetParentAddressSizeCells (DeviceTreeAddress, Node, &AddressCells, &SizeCells)) {
+      continue;
+    }
+
+    EntryCells = AddressCells + SizeCells;
+    EntrySize = EntryCells * sizeof (UINT32);
+    RegProp = fdt_getprop (DeviceTreeAddress, Node, "reg", &Len);
+    if ((RegProp == NULL) || (Len <= 0) || ((Len % EntrySize) != 0)) {
+      continue;
+    }
+
+    Cells = RegProp;
+    Entries = Len / EntrySize;
+    for (Index = 0; Index < Entries; Index++) {
+      CurBase = ReadFdtCells (&Cells, AddressCells);
+      CurSize = ReadFdtCells (&Cells, SizeCells);
+      if ((CurSize == 0) || (CurBase > MAX_UINT64 - CurSize)) {
+        continue;
+      }
+
+      CurEnd = CurBase + CurSize;
+      PublishBase = CurBase;
+      PublishSize = CurSize;
+
+      if (CurBase == LowestMemBase) {
+        if (UefiMemoryBase >= CurEnd) {
+          DEBUG ((DEBUG_ERROR, "%a: UEFI memory base is outside boot memory\n", __func__));
+          continue;
+        }
+
+        if (UefiMemoryBase > CurBase) {
+          PublishBase = UefiMemoryBase;
+          PublishSize = CurEnd - UefiMemoryBase;
+        }
+      }
+
+      if (PublishSize == 0) {
+        continue;
+      }
+
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: System RAM @ 0x%lx - 0x%lx\n",
+        __func__,
+        PublishBase,
+        PublishBase + PublishSize - 1
+        ));
+
+      InitializeRamRegions (PublishBase, PublishSize);
+      PublishedMemory = TRUE;
+    }
+  }
+
+  if (!PublishedMemory) {
+    return EFI_NOT_FOUND;
+  }
 
   AddReservedMemoryMap (DeviceTreeAddress);
 
