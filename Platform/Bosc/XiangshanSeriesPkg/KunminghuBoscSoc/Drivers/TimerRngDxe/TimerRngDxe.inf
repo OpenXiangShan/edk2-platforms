@@ -1,0 +1,38 @@
+## @file
+# Timer-backed non-secure EFI_RNG_PROTOCOL provider for Kunminghu.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = TimerRngDxe
+  FILE_GUID                      = A74F4D58-850A-4D76-8B9E-6EA9E217E765
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TimerRngDxeEntryPoint
+
+[Sources]
+  TimerRngDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEdkiiRngAlgorithmUnSafe       ## PRODUCES
+
+[Protocols]
+  gEfiRngProtocolGuid            ## PRODUCES
+
+[Depex]
+  TRUE

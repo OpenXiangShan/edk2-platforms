@@ -1,0 +1,175 @@
+/** @file
+*  Multiple APIC Description Table (MADT) for QEMU kmh-bosc-soc.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#include "AcpiHeader.h"
+
+#define KMH_BOSC_DIES                     4
+#define KMH_BOSC_APP_HARTS_PER_DIE        16
+#define KMH_BOSC_CPU_NUM                  64
+#define KMH_BOSC_DIE_SHIFT                44
+
+#define KMH_BOSC_IMSIC_S_BASE             0x000000001D000000ULL
+#define KMH_BOSC_IMSIC_STRIDE             0x8000
+#define KMH_BOSC_IMSIC_SIZE               0x8000
+#define KMH_BOSC_IMSIC_NUM_IDS            255
+#define KMH_BOSC_IMSIC_GUEST_INDEX_BITS   3
+#define KMH_BOSC_IMSIC_HART_INDEX_BITS    4
+#define KMH_BOSC_IMSIC_GROUP_INDEX_BITS   2
+
+#define KMH_BOSC_APLIC_S_BASE             0x000000001E024000ULL
+#define KMH_BOSC_APLIC_S_SIZE             0x4000
+#define KMH_BOSC_APLIC_NUM_SOURCES        96
+
+#define KMH_BOSC_FOR_EACH_HART(M) \
+  M (0)  M (1)  M (2)  M (3)  M (4)  M (5)  M (6)  M (7)  \
+  M (8)  M (9)  M (10) M (11) M (12) M (13) M (14) M (15) \
+  M (16) M (17) M (18) M (19) M (20) M (21) M (22) M (23) \
+  M (24) M (25) M (26) M (27) M (28) M (29) M (30) M (31) \
+  M (32) M (33) M (34) M (35) M (36) M (37) M (38) M (39) \
+  M (40) M (41) M (42) M (43) M (44) M (45) M (46) M (47) \
+  M (48) M (49) M (50) M (51) M (52) M (53) M (54) M (55) \
+  M (56) M (57) M (58) M (59) M (60) M (61) M (62) M (63)
+
+#define KMH_BOSC_FOR_EACH_DIE(M) \
+  M (0) M (1) M (2) M (3)
+
+#define KMH_BOSC_DIE_ADDR(Die, Offset) \
+  ((((UINT64)(Die)) << KMH_BOSC_DIE_SHIFT) | ((UINT64)(Offset)))
+
+#define KMH_BOSC_HART_DIE(Hart) \
+  ((Hart) / KMH_BOSC_APP_HARTS_PER_DIE)
+
+#define KMH_BOSC_HART_LOCAL(Hart) \
+  ((Hart) % KMH_BOSC_APP_HARTS_PER_DIE)
+
+#define KMH_BOSC_IMSIC_S_ADDR(Hart) \
+  (KMH_BOSC_DIE_ADDR (KMH_BOSC_HART_DIE (Hart), KMH_BOSC_IMSIC_S_BASE) + \
+   (KMH_BOSC_HART_LOCAL (Hart) * KMH_BOSC_IMSIC_STRIDE))
+
+//
+// Multiple APIC Description Table
+//
+#pragma pack (1)
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT8  Version;
+  UINT8  Id;
+  UINT32 Flags;
+  UINT8  HwId[8];
+  UINT16 NumIdcs;
+  UINT16 NumSrcs;
+  UINT32 GsiBase;
+  UINT64 Base;
+  UINT32 Size;
+} EFI_ACPI_MADT_APLIC_STRUCTURE;
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT8  Version;
+  UINT8  AplicId;
+  UINT32 Flags;
+  UINT16 NumIds;
+  UINT16 NumGuestIds;
+  UINT8  GuestIdxBits;
+  UINT8  HartIdxBits;
+  UINT8  GroupIdxBits;
+  UINT8  GroupIdxShift;
+} EFI_ACPI_MADT_IMSIC_STRUCTURE;
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT8  Version;
+  UINT8  Reserved;
+  UINT32 Flags;
+  UINT64 HartId;
+  UINT32 Uid;
+  UINT32 ExtIntcId;
+  UINT64 ImsicBase;
+  UINT32 ImsicSize;
+} EFI_ACPI_MADT_INTC_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_MADT_INTC_STRUCTURE                          Intc[KMH_BOSC_CPU_NUM];
+  EFI_ACPI_MADT_IMSIC_STRUCTURE                         Imsic[1];
+  EFI_ACPI_MADT_APLIC_STRUCTURE                         Aplic[KMH_BOSC_DIES];
+} EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+#define KMH_MADT_INTC_ENTRY(Hart) { \
+  0x18,                             /* Type */ \
+  36,                               /* Length */ \
+  1,                                /* Version */ \
+  0,                                /* Reserved */ \
+  1,                                /* Flags */ \
+  (Hart),                           /* HartId */ \
+  (Hart),                           /* Uid */ \
+  0,                                /* ExtIntcId */ \
+  KMH_BOSC_IMSIC_S_ADDR (Hart),     /* ImsicBase */ \
+  KMH_BOSC_IMSIC_SIZE               /* ImsicSize */ \
+},
+
+#define KMH_MADT_APLIC_ENTRY(Die) { \
+  0x1A,                             /* Type */ \
+  36,                               /* Length */ \
+  1,                                /* Version */ \
+  (Die),                            /* Id */ \
+  0,                                /* Flags */ \
+  { 0, 0, 0, 0, 0, 0, 0, 0 },       /* HwId */ \
+  0,                                /* NumIdcs */ \
+  KMH_BOSC_APLIC_NUM_SOURCES,       /* NumSrcs */ \
+  ((Die) * KMH_BOSC_APLIC_NUM_SOURCES), \
+  KMH_BOSC_DIE_ADDR ((Die), KMH_BOSC_APLIC_S_BASE), \
+  KMH_BOSC_APLIC_S_SIZE \
+},
+
+EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    ACPI_HEADER (
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    //
+    // MADT specific fields
+    //
+    0,
+    0,
+  },
+  {
+    KMH_BOSC_FOR_EACH_HART (KMH_MADT_INTC_ENTRY)
+  },
+  {
+    {
+      0x19,
+      16,
+      1,
+      0,
+      0,
+      KMH_BOSC_IMSIC_NUM_IDS,
+      KMH_BOSC_IMSIC_NUM_IDS,
+      KMH_BOSC_IMSIC_GUEST_INDEX_BITS,
+      KMH_BOSC_IMSIC_HART_INDEX_BITS,
+      KMH_BOSC_IMSIC_GROUP_INDEX_BITS,
+      KMH_BOSC_DIE_SHIFT,
+    },
+  },
+  {
+    KMH_BOSC_FOR_EACH_DIE (KMH_MADT_APLIC_ENTRY)
+  },
+};
+
+VOID* CONST ReferenceAcpiTable = &Madt;

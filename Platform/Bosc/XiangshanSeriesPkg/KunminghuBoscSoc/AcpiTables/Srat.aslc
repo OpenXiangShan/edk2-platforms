@@ -1,0 +1,104 @@
+/** @file
+*  System Resource Affinity Table (SRAT) for QEMU kmh-bosc-soc.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Library/AcpiLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#include "AcpiHeader.h"
+
+#define KMH_BOSC_DIES                     4
+#define KMH_BOSC_APP_HARTS_PER_DIE        16
+#define KMH_BOSC_CPU_NUM                  64
+#define KMH_BOSC_DDR_NODE_BASE            0x0000000080000000ULL
+#define KMH_BOSC_DDR_NODE_STRIDE          0x0000000800000000ULL
+#define KMH_BOSC_DDR_NODE_SIZE            0x0000000080000000ULL
+
+#define KMH_BOSC_FOR_EACH_HART(M) \
+  M (0)  M (1)  M (2)  M (3)  M (4)  M (5)  M (6)  M (7)  \
+  M (8)  M (9)  M (10) M (11) M (12) M (13) M (14) M (15) \
+  M (16) M (17) M (18) M (19) M (20) M (21) M (22) M (23) \
+  M (24) M (25) M (26) M (27) M (28) M (29) M (30) M (31) \
+  M (32) M (33) M (34) M (35) M (36) M (37) M (38) M (39) \
+  M (40) M (41) M (42) M (43) M (44) M (45) M (46) M (47) \
+  M (48) M (49) M (50) M (51) M (52) M (53) M (54) M (55) \
+  M (56) M (57) M (58) M (59) M (60) M (61) M (62) M (63)
+
+#define KMH_BOSC_FOR_EACH_DIE(M) \
+  M (0) M (1) M (2) M (3)
+
+#define KMH_BOSC_HART_DIE(Hart) \
+  ((Hart) / KMH_BOSC_APP_HARTS_PER_DIE)
+
+#define KMH_BOSC_DDR_BASE(Die) \
+  (KMH_BOSC_DDR_NODE_BASE + ((UINT64)(Die) * KMH_BOSC_DDR_NODE_STRIDE))
+
+#define UINT32_LOW(Value)   ((UINT32)((UINT64)(Value)))
+#define UINT32_HIGH(Value)  ((UINT32)(((UINT64)(Value)) >> 32))
+
+#pragma pack (1)
+
+typedef struct {
+  UINT8  Type;
+  UINT8  Length;
+  UINT16 Reserved;
+  UINT32 ProximityDomain;
+  UINT32 AcpiProcessorUid;
+  UINT32 Flags;
+  UINT32 ClockDomain;
+} EFI_ACPI_RINTC_AFFINITY_STRUCTURE;
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  UINT32                      Reserved1;
+  UINT64                      Reserved2;
+  EFI_ACPI_RINTC_AFFINITY_STRUCTURE       Rintc[KMH_BOSC_CPU_NUM];
+  EFI_ACPI_6_0_MEMORY_AFFINITY_STRUCTURE  Memory[KMH_BOSC_DIES];
+} EFI_ACPI_STATIC_RESOURCE_AFFINITY_TABLE;
+
+#pragma pack ()
+
+#define KMH_SRAT_RINTC_ENTRY(Hart) { \
+  7, \
+  sizeof (EFI_ACPI_RINTC_AFFINITY_STRUCTURE), \
+  0, \
+  KMH_BOSC_HART_DIE (Hart), \
+  (Hart), \
+  EFI_ACPI_6_0_GICC_ENABLED, \
+  0 \
+},
+
+#define KMH_SRAT_MEMORY_ENTRY(Die) { \
+  EFI_ACPI_6_0_MEMORY_AFFINITY, \
+  sizeof (EFI_ACPI_6_0_MEMORY_AFFINITY_STRUCTURE), \
+  (Die), \
+  0, \
+  UINT32_LOW (KMH_BOSC_DDR_BASE (Die)), \
+  UINT32_HIGH (KMH_BOSC_DDR_BASE (Die)), \
+  UINT32_LOW (KMH_BOSC_DDR_NODE_SIZE), \
+  UINT32_HIGH (KMH_BOSC_DDR_NODE_SIZE), \
+  0, \
+  EFI_ACPI_6_0_MEMORY_ENABLED, \
+  0 \
+},
+
+EFI_ACPI_STATIC_RESOURCE_AFFINITY_TABLE Srat = {
+  ACPI_HEADER (
+    EFI_ACPI_6_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+    EFI_ACPI_STATIC_RESOURCE_AFFINITY_TABLE,
+    EFI_ACPI_6_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION
+  ),
+  1,
+  0,
+  {
+    KMH_BOSC_FOR_EACH_HART (KMH_SRAT_RINTC_ENTRY)
+  },
+  {
+    KMH_BOSC_FOR_EACH_DIE (KMH_SRAT_MEMORY_ENTRY)
+  },
+};
+
+VOID* CONST ReferenceAcpiTable = &Srat;
