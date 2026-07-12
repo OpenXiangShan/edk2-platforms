@@ -1,0 +1,36 @@
+#/** @file
+#  PCI Host Bridge Library for QEMU kmh-bosc-soc DesignWare PCIe roots.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = KmhBoscSocPciHostBridgeLib
+  FILE_GUID                      = 51A13D7B-6382-4C45-B79A-D741539EFB4D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+
+[Sources]
+  PciHostBridgeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  PcdLib
+  FdtLib
+
+[Guids]
+  gFdtHobGuid
