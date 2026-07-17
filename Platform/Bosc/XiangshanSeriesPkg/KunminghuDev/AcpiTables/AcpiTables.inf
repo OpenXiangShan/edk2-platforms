@@ -11,8 +11,6 @@
   einj.asl
   hest.asl
   erst.asl
-  Madt.aslc
-  Rhct.aslc
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec

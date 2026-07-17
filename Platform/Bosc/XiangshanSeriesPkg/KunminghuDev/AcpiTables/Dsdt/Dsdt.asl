@@ -14,7 +14,7 @@ DefinitionBlock ("DsdtTable.aml", "DSDT",
   Scope (_SB) {
     include ("Uart.asl")
     //include ("sd.asl")
-    //include ("Pci.asl")
+    include ("Pci.asl")
     include ("Aplic.asl")
   } // Scope (_SB)
 }

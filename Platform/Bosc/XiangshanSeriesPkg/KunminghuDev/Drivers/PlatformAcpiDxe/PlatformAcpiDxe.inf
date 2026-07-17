@@ -30,7 +30,9 @@
   DebugLib
   DxeServicesLib
   AcpiLib
+  IoLib
   MemoryAllocationLib
+  TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
@@ -39,8 +41,10 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid
   gFdtClientProtocolGuid
+  gEfiAcpiTableProtocolGuid
 
 [Pcd]
 
 [Depex]
   gEfiAcpiTableProtocolGuid AND gFdtClientProtocolGuid
+  
