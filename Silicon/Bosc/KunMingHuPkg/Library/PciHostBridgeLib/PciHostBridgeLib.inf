@@ -27,14 +27,22 @@
   PciHostBridgeLib.c
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
 
 [LibraryClasses]
+  BaseLib
   DebugLib
+  IoLib
+  TimerLib
+  UefiBootServicesTableLib
 
 [Guids]
+
+[Protocols]
+  gFdtClientProtocolGuid
 
 [FixedPcd]
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase
