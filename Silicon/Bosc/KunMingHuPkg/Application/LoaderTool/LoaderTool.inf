@@ -30,6 +30,7 @@
   UefiLib
   UefiRuntimeServicesTableLib
   PcdLib
+  CacheMaintenanceLib
 
 [Guids]
   gEfiBoscSiliconTokenSpaceGuid
