@@ -28,6 +28,10 @@ FV = FVMAIN_COMPACT
 
 !include VarStore.fdf.inc
 
+#$(KERNEL_OFFSET)|$(KERNEL_SIZE)
+#gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+#FILE = edk2-platforms/Silicon/Bosc/KunMingHuPkg/Application/LoaderTool/Image
+
 ################################################################################
 
 [FV.DXEFV]
@@ -67,6 +71,7 @@ INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
 INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 INF  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformFdtCheckDxe/PlatformFdtCheckDxe.inf
 INF  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -115,6 +120,9 @@ INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformRamDiskDxe/PlatformRamDiskDxe.inf
+INF  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformInitrdLoadFileDxe/PlatformInitrdLoadFileDxe.inf
 
 !ifndef $(SOURCE_DEBUG_ENABLE)
 INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
@@ -137,9 +145,12 @@ INF  ShellPkg/Application/Shell/Shell.inf
 #
 # PCI Support
 #
-# INF UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
-# INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
-# INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+# RC0 is initialized by PlatformAcpiDxe. Enable UEFI PCI enumeration here when
+# validating PciHostBridgeLib DT-derived apertures.
+INF UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
+INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+
 
 # NVMe boot devices
 #

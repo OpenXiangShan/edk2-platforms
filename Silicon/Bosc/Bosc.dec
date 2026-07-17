@@ -32,6 +32,10 @@
   gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|0|UINT64|0x40000003
   gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize|0|UINT64|0x40000004
   gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId|0|UINT64|0x40000005
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskBase|0|UINT64|0x40000006
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSize|0|UINT64|0x40000007
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase|0|UINT64|0x40000008
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize|0|UINT64|0x40000009
 
   #Mmc host controller
   gEfiBoscSiliconTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000010
@@ -39,4 +43,6 @@
 [PcdsDynamic, PcdsDynamicEx]
 
 [PcdsFeatureFlag]
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSupported|FALSE|BOOLEAN|0x40000100
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSupported|FALSE|BOOLEAN|0x40000101
 

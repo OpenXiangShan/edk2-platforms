@@ -1,0 +1,43 @@
+## @file
+#  KMH Platform fixed-memory initrd LoadFile2 provider.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformInitrdLoadFileDxe
+  FILE_GUID                      = 6A7AF58A-7A01-45F7-A3A0-7F4D58D05F9C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = KmhPlatformInitrdEntryPoint
+
+[Sources]
+  PlatformInitrdLoadFileDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Bosc/Bosc.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiLoadFile2ProtocolGuid
+
+[FeaturePcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSupported
+
+[FixedPcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize
+
+[Depex]
+  TRUE

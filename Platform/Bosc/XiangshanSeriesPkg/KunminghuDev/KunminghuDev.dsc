@@ -78,12 +78,14 @@
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLibRam.inf
@@ -268,26 +270,28 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSupported|TRUE
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSupported|TRUE
 
 [PcdsFixedAtBuild]
   #
   # XILINX PCI Root Complex
   #
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x40000000
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x67ff0000
   gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x50000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase|0x40000000
+ gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x20000000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase|0x67ff0000
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigSize|0x10000000
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMin|0
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax|255
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax|0xff
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoBase|0x00000
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoSize|0xf00000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base|0x50000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size|0x10000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base|0x1000000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size|0x0000000000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base|0x60000000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size|0x07ff0000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base|0x4000000000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size|0x1000000000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
@@ -312,6 +316,14 @@
 !ifdef $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
+
+  # RamDisk image region loaded by QEMU loader.
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskBase|0x3E0000000
+  # Use a non-4K-multiple size so RamDiskDxe falls back to 512-byte BlockIo.
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSize|0x7FF00000
+  # Initrd image region loaded by QEMU loader.
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase|0x460000000
+  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize|0x028D8800
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
@@ -398,7 +410,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
 
 [PcdsDynamicHii]
-  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|FALSE|NV,BS
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|TRUE|NV,BS
 
 ################################################################################
 #
@@ -441,6 +453,7 @@
     <LibraryClasses>
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   }
+  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformFdtCheckDxe/PlatformFdtCheckDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
@@ -504,10 +517,10 @@
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 
-  # No graphic console supported yet.
-  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  # graphic console supported yet.
+   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf {
+      <LibraryClasses>
+        PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf {
@@ -559,6 +572,9 @@
   #
   FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformRamDiskDxe/PlatformRamDiskDxe.inf
+  Platform/Bosc/XiangshanSeriesPkg/KunminghuDev/Drivers/PlatformInitrdLoadFileDxe/PlatformInitrdLoadFileDxe.inf
 
   OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
     <PcdsFixedAtBuild>
@@ -590,6 +606,8 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
+
+  Silicon/Bosc/KunMingHuPkg/Application/BdsLoaderTool/BdsLoaderTool.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf

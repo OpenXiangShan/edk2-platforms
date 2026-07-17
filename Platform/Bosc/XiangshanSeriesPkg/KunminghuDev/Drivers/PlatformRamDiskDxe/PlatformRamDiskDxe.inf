@@ -1,0 +1,42 @@
+## @file
+#  KMH Platform RamDisk DXE driver
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformRamDiskDxe
+  FILE_GUID                      = 2F9DB3C6-7F18-4E6F-9E39-5E4A7B7ED2A1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = KmhPlatformRamDiskEntryPoint
+
+[Sources]
+  PlatformRamDiskDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Bosc/Bosc.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiRamDiskProtocolGuid
+
+[Guids]
+  gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
+
+[FeaturePcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSupported
+
+[FixedPcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSize
+
+[Depex]
+  gEfiRamDiskProtocolGuid
