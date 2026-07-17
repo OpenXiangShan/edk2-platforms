@@ -1,0 +1,40 @@
+[Defines]
+  INF_VERSION = 0x00010006
+  BASE_NAME = BdsLoaderTool
+  FILE_GUID = 4A4B2A66-9E59-4C62-BD69-7C932B9F6C41
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 1.0
+  ENTRY_POINT = BdsLoaderToolMain
+
+[Sources]
+  BdsLoaderTool.c
+
+[Packages]
+  Silicon/Bosc/Bosc.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  CacheMaintenanceLib
+  PrintLib
+  DevicePathLib
+
+[Guids]
+  gEfiBoscSiliconTokenSpaceGuid
+  gEfiFileInfoGuid
+
+[Pcd]
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
+  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
