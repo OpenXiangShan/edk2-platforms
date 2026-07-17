@@ -1,0 +1,46 @@
+## @file
+#  Lightweight FDT consistency checker for KunminghuDev.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformFdtCheckDxe
+  FILE_GUID                      = 0F9C5A1B-4F62-4AC4-8E0E-311E58C2C67A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformFdtCheckEntryPoint
+
+[Sources]
+  PlatformFdtCheckDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gFdtClientProtocolGuid
+
+[FixedPcd]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMin
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation
+
+[Depex]
+  gFdtClientProtocolGuid
