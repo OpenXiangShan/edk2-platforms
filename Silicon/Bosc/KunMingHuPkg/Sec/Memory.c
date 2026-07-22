@@ -206,6 +206,12 @@ GetParentAddressSizeCells (
 **/
 STATIC
 VOID
+AddChosenPayloadMemoryMap (
+  IN VOID  *FdtPointer
+  );
+
+STATIC
+VOID
 AddReservedMemoryMap (
   IN VOID  *FdtPointer
   )
@@ -288,6 +294,181 @@ AddReservedMemoryMap (
         }
       }
     }
+  }
+
+  AddChosenPayloadMemoryMap (FdtPointer);
+}
+
+STATIC
+BOOLEAN
+ReadChosenU64Property (
+  IN  VOID         *FdtPointer,
+  IN  INT32        ChosenNode,
+  IN  CONST CHAR8  *PropertyName,
+  OUT UINT64       *Value
+  )
+{
+  CONST UINT32  *Property;
+  INT32         Len;
+
+  if ((FdtPointer == NULL) || (PropertyName == NULL) || (Value == NULL)) {
+    return FALSE;
+  }
+
+  Property = fdt_getprop (FdtPointer, ChosenNode, PropertyName, &Len);
+  if (Property == NULL) {
+    return FALSE;
+  }
+
+  if (Len == sizeof (UINT64)) {
+    *Value = LShiftU64 (fdt32_to_cpu (Property[0]), 32) | fdt32_to_cpu (Property[1]);
+    return TRUE;
+  }
+
+  if (Len == sizeof (UINT32)) {
+    *Value = fdt32_to_cpu (Property[0]);
+    return TRUE;
+  }
+
+  DEBUG ((DEBUG_WARN, "%a: /chosen/%a has invalid size %d\n", __func__, PropertyName, Len));
+  return FALSE;
+}
+
+STATIC
+BOOLEAN
+ReadChosenU32Property (
+  IN  VOID         *FdtPointer,
+  IN  INT32        ChosenNode,
+  IN  CONST CHAR8  *PropertyName,
+  OUT UINT32       *Value
+  )
+{
+  CONST UINT32  *Property;
+  INT32         Len;
+
+  if ((FdtPointer == NULL) || (PropertyName == NULL) || (Value == NULL)) {
+    return FALSE;
+  }
+
+  Property = fdt_getprop (FdtPointer, ChosenNode, PropertyName, &Len);
+  if (Property == NULL) {
+    return FALSE;
+  }
+
+  if (Len == sizeof (UINT32)) {
+    *Value = fdt32_to_cpu (Property[0]);
+    return TRUE;
+  }
+
+  DEBUG ((DEBUG_WARN, "%a: /chosen/%a has invalid size %d\n", __func__, PropertyName, Len));
+  return FALSE;
+}
+
+STATIC
+BOOLEAN
+AddChosenPayloadRange (
+  IN VOID         *FdtPointer,
+  IN INT32        ChosenNode,
+  IN CONST CHAR8  *Name,
+  IN CONST CHAR8  *StartPropertyName,
+  IN CONST CHAR8  *EndPropertyName,
+  IN CONST CHAR8  *SizePropertyName
+  )
+{
+  UINT64                Base;
+  UINT64                End;
+  UINT64                Size;
+  EFI_PHYSICAL_ADDRESS  Addr;
+
+  if ((Name == NULL) || (StartPropertyName == NULL) || (EndPropertyName == NULL) || (SizePropertyName == NULL)) {
+    return FALSE;
+  }
+
+  if (!ReadChosenU64Property (FdtPointer, ChosenNode, StartPropertyName, &Base)) {
+    return FALSE;
+  }
+
+  if (ReadChosenU64Property (FdtPointer, ChosenNode, EndPropertyName, &End)) {
+    if (End <= Base) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid /chosen %a range base=0x%llx end=0x%llx\n", __func__, Name, Base, End));
+      return FALSE;
+    }
+
+    Size = End - Base;
+  } else if (!ReadChosenU64Property (FdtPointer, ChosenNode, SizePropertyName, &Size) || (Size == 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: missing /chosen %a end/size\n", __func__, Name));
+    return FALSE;
+  }
+
+  Addr = (EFI_PHYSICAL_ADDRESS)Base;
+  DEBUG ((DEBUG_INFO, "%a: Adding /chosen payload %a Addr = 0x%llx, Size = 0x%llx\n", __func__, Name, Addr, Size));
+  BuildMemoryAllocationHob (
+    Addr,
+    Size,
+    EfiBootServicesData
+    );
+  return TRUE;
+}
+
+STATIC
+BOOLEAN
+IsFpgaMultistageBurnEnabled (
+  IN VOID  *FdtPointer,
+  IN INT32  ChosenNode
+  )
+{
+  UINT32  Flag;
+
+  if (!ReadChosenU32Property (FdtPointer, ChosenNode, "kmh,fpga-multistage-burn", &Flag)) {
+    return FALSE;
+  }
+
+  return Flag != 0;
+}
+
+STATIC
+VOID
+AddChosenPayloadMemoryMap (
+  IN VOID  *FdtPointer
+  )
+{
+  INT32    ChosenNode;
+  BOOLEAN  FoundInitrd;
+
+  ChosenNode = fdt_path_offset (FdtPointer, "/chosen");
+  if (ChosenNode < 0) {
+    return;
+  }
+
+  if (!IsFpgaMultistageBurnEnabled (FdtPointer, ChosenNode)) {
+    return;
+  }
+
+  AddChosenPayloadRange (
+    FdtPointer,
+    ChosenNode,
+    "image3",
+    "kmh,image3-start",
+    "kmh,image3-end",
+    "kmh,image3-size"
+    );
+  FoundInitrd = AddChosenPayloadRange (
+    FdtPointer,
+    ChosenNode,
+    "image4 initrd",
+    "linux,initrd-start",
+    "linux,initrd-end",
+    "linux,initrd-size"
+    );
+  if (!FoundInitrd) {
+    AddChosenPayloadRange (
+      FdtPointer,
+      ChosenNode,
+      "image4 initrd",
+      "kmh,image4-start",
+      "kmh,image4-end",
+      "kmh,image4-size"
+      );
   }
 }
 

@@ -25,21 +25,6 @@
 
 [Protocols]
 
-[PcdsFixedAtBuild]
-  #Bosc Payload loader info
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase|0|UINT64|0x40000001
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize|0|UINT64|0x40000002
-  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase|0|UINT64|0x40000003
-  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize|0|UINT64|0x40000004
-  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId|0|UINT64|0x40000005
-  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskBase|0|UINT64|0x40000006
-  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSize|0|UINT64|0x40000007
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase|0|UINT64|0x40000008
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize|0|UINT64|0x40000009
-
-  #Mmc host controller
-  gEfiBoscSiliconTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000010
-
 [PcdsDynamic, PcdsDynamicEx]
 
 [PcdsFeatureFlag]

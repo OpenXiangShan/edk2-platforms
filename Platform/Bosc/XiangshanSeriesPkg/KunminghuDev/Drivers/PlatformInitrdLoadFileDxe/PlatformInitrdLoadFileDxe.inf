@@ -16,11 +16,13 @@
   PlatformInitrdLoadFileDxe.c
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Bosc/Bosc.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   DevicePathLib
@@ -30,14 +32,11 @@
   UefiDriverEntryPoint
 
 [Protocols]
+  gFdtClientProtocolGuid
   gEfiLoadFile2ProtocolGuid
 
 [FeaturePcd]
   gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSupported
 
-[FixedPcd]
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize
-
 [Depex]
-  TRUE
+  gFdtClientProtocolGuid
