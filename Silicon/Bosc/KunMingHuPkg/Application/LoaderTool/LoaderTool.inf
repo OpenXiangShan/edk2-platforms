@@ -29,18 +29,7 @@
   ShellLib
   UefiLib
   UefiRuntimeServicesTableLib
-  PcdLib
   CacheMaintenanceLib
-
-[Guids]
-  gEfiBoscSiliconTokenSpaceGuid
-
-[pcd]
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
-  gEfiBoscSiliconTokenSpaceGuid.PcdDTBBase
-  gEfiBoscSiliconTokenSpaceGuid.PcdDTBSize
-  gEfiBoscSiliconTokenSpaceGuid.PcdBootHartId
 
 [Guids]
   gShellLoaderToolHiiGuid

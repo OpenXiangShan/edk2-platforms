@@ -10,7 +10,6 @@
   BdsLoaderTool.c
 
 [Packages]
-  Silicon/Bosc/Bosc.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -22,18 +21,12 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  PcdLib
   CacheMaintenanceLib
   PrintLib
   DevicePathLib
 
 [Guids]
-  gEfiBoscSiliconTokenSpaceGuid
   gEfiFileInfoGuid
-
-[Pcd]
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelBase
-  gEfiBoscSiliconTokenSpaceGuid.PcdKernelSize
 
 [Protocols]
   gEfiLoadedImageProtocolGuid

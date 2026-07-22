@@ -39,7 +39,6 @@ STATIC CONST EFI_GUID mKmhFdtBootargsGuid = {
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"efi_stub", TypeFlag},
-  {L"jump", TypeFlag},
   {L"help", TypeFlag},
   {L"-image", TypeValue},
   {NULL , TypeMax}
@@ -52,12 +51,10 @@ Usage (
   )
 {
   Print (L"Bosc Linux Loader:\n"
-         "To boot linux from payload in uefi.\n"
+         "To boot linux from an external EFI Image in uefi.\n"
 	 "\n"
-         "1. bl jump\n"
-	 "   Jump to start address of payload in uefi.\n"
-         "2. bl efi_stub [ImagePath] [param1 param2 ...]\n"
-	 "   find efi entry point in payload or external Image and start from it.\n"
+         "1. bl efi_stub [ImagePath] [param1 param2 ...]\n"
+	 "   find efi entry point in external Image and start from it.\n"
 	 "   If no param is provided, command line comes from DT bootargs.\n"
 	 "   eg. bl efi_stub\n"
 	 "   eg. bl efi_stub fs0:\\VMLINUX.EFI\n"
@@ -73,28 +70,6 @@ ShellCommandGetManFileNameLoaderTool (
   )
 {
   return gShellLoaderToolFileName;
-}
-
-SHELL_STATUS
-EFIAPI
-ShellBootFromAddress (unsigned long entry, unsigned long dtb, unsigned long hartid)
-{
-  ((void(*)(unsigned long, unsigned long))entry)(hartid, dtb);
-  
-  return EFI_SUCCESS;
-}
-
-SHELL_STATUS
-EFIAPI
-ShellCommandSimpleJump (
-  VOID
-  )
-{
-  unsigned long long kernel_entry = FixedPcdGet32(PcdKernelBase);
-  unsigned long long dtb_start = FixedPcdGet32(PcdDTBBase);
-  int hart_id = FixedPcdGet32 (PcdBootHartId);
- 
-  return ShellBootFromAddress (kernel_entry, dtb_start, hart_id);
 }
 
 STATIC
@@ -394,10 +369,7 @@ ShellCommandCopyKernelImage (
     return EFI_LOAD_ERROR;
   }
 
-  AllocSize = FixedPcdGet64 (PcdKernelSize) + KMH_KERNEL_COPY_EXTRA_SIZE;
-  if (AllocSize < PeImageSize) {
-    AllocSize = PeImageSize + KMH_KERNEL_COPY_EXTRA_SIZE;
-  }
+  AllocSize = PeImageSize + KMH_KERNEL_COPY_EXTRA_SIZE;
   AllocSize = ALIGN_VALUE (AllocSize, EFI_PAGE_SIZE);
   AllocPages = EFI_SIZE_TO_PAGES (AllocSize);
 
@@ -454,7 +426,7 @@ ShellCommandEfiStub (
   CHAR16                      *ExternalImagePath;
   VOID                        *ExternalImageBuffer;
 
-  SourceImageBase     = FixedPcdGet64(PcdKernelBase);
+  SourceImageBase     = 0;
   ExternalImagePath   = (CHAR16 *)ShellCommandLineGetValue (CheckPackage, L"-image");
   ExternalImageBuffer = NULL;
   CmdLineStartIndex   = 1;
@@ -479,7 +451,7 @@ ShellCommandEfiStub (
   }
   ExternalImageBuffer = (VOID *)(UINTN)SourceImageBase;
 
-  Print (L"ImageBase:0x%p ImageSize:0x%lx PcdKernelSize:0x%lx\n", SourceImageBase, ImageSize, FixedPcdGet64 (PcdKernelSize));
+  Print (L"ImageBase:0x%p ImageSize:0x%lx\n", SourceImageBase, ImageSize);
 
   EntryPoint = ShellCommandGetEfiEntryPoint (SourceImageBase);
   if (!EntryPoint) {
@@ -588,10 +560,7 @@ ShellCommandRunBoscLoaderTool (
     return SHELL_ABORTED;
   }
 
-  if (ShellCommandLineGetFlag (CheckPackage, L"jump")) {
-    return ShellCommandSimpleJump ();
-  }
-  else if (ShellCommandLineGetFlag (CheckPackage, L"efi_stub")) {
+  if (ShellCommandLineGetFlag (CheckPackage, L"efi_stub")) {
     return ShellCommandEfiStub (CheckPackage, SystemTable);
   }
   else if (ShellCommandLineGetFlag (CheckPackage, L"help")) {

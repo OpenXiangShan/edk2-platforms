@@ -8,7 +8,6 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -343,11 +342,7 @@ KmhCopyKernelImage (
     return EFI_LOAD_ERROR;
   }
 
-  AllocSize = FixedPcdGet64 (PcdKernelSize) + KMH_KERNEL_COPY_EXTRA_SIZE;
-  if (AllocSize < PeImageSize) {
-    AllocSize = PeImageSize + KMH_KERNEL_COPY_EXTRA_SIZE;
-  }
-
+  AllocSize = PeImageSize + KMH_KERNEL_COPY_EXTRA_SIZE;
   AllocSize = ALIGN_VALUE (AllocSize, EFI_PAGE_SIZE);
   AllocPages = EFI_SIZE_TO_PAGES (AllocSize);
   AllocBase = 0;
@@ -419,7 +414,7 @@ BdsLoaderToolMain (
 
   Print (L"BdsLoaderTool: standard BDS entry started\n");
 
-  SourceImageBase = FixedPcdGet64 (PcdKernelBase);
+  SourceImageBase = 0;
   ExternalImageBuffer = NULL;
 
   Status = KmhReadExternalImage (&SourceImageBase, &ImageSize);
@@ -430,12 +425,7 @@ BdsLoaderToolMain (
     return Status;
   }
 
-  Print (
-    L"BdsLoaderTool: ImageBase=0x%lx ImageSize=0x%lx PcdKernelSize=0x%lx\n",
-    SourceImageBase,
-    ImageSize,
-    FixedPcdGet64 (PcdKernelSize)
-    );
+  Print (L"BdsLoaderTool: ImageBase=0x%lx ImageSize=0x%lx\n", SourceImageBase, ImageSize);
 
   EntryPoint = KmhGetEfiEntryPoint (SourceImageBase);
   if (EntryPoint == NULL) {
