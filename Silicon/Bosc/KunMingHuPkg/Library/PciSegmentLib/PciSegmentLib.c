@@ -13,6 +13,8 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/FdtClient.h>
 
 typedef enum {
   PciCfgWidthUint8 = 0,
@@ -20,6 +22,9 @@ typedef enum {
   PciCfgWidthUint32,
   PciCfgWidthMax
 } PCI_CFG_WIDTH;
+
+STATIC BOOLEAN  mPciConfigBaseCached;
+STATIC UINT64   mPciConfigBase;
 
 /**
   Assert the validity of a PCI Segment address.
@@ -40,6 +45,68 @@ ASSERT (((A) & (0xffff0000f0000000ULL | (M))) == 0)
   (Function) = (((Address) >> 12) & 0x07);   \
 }
 
+STATIC
+UINT64
+KmhFdtReadCells (
+  IN CONST UINT32  *Cells,
+  IN UINTN         CellCount
+  )
+{
+  UINT64  Value;
+  UINTN   Index;
+
+  Value = 0;
+  for (Index = 0; Index < CellCount; Index++) {
+    Value = LShiftU64 (Value, 32) | SwapBytes32 (Cells[Index]);
+  }
+
+  return Value;
+}
+
+STATIC
+UINT64
+KmhGetPciConfigBaseFromDt (
+  VOID
+  )
+{
+  EFI_STATUS           Status;
+  FDT_CLIENT_PROTOCOL  *FdtClient;
+  INT32                Node;
+
+  if (mPciConfigBaseCached) {
+    return mPciConfigBase;
+  }
+
+  mPciConfigBase = MAX_UINT64;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL, (VOID **)&FdtClient);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "KMH-PCI-SEG: FDT client not found - %r\n", Status));
+    return mPciConfigBase;
+  }
+
+  for (Status = FdtClient->FindCompatibleNode (FdtClient, "snps,dw-pcie", &Node);
+       !EFI_ERROR (Status);
+       Status = FdtClient->FindNextCompatibleNode (FdtClient, "snps,dw-pcie", Node, &Node))
+  {
+    CONST UINT32  *Reg;
+    UINT32        RegSize;
+
+    Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg", (CONST VOID **)&Reg, &RegSize);
+    if (EFI_ERROR (Status) || (RegSize < 8 * sizeof (UINT32))) {
+      continue;
+    }
+
+    mPciConfigBase = KmhFdtReadCells (&Reg[4], 2);
+    mPciConfigBaseCached = TRUE;
+    DEBUG ((DEBUG_INFO, "KMH-PCI-SEG: config base from DT=0x%lx\n", mPciConfigBase));
+    return mPciConfigBase;
+  }
+
+  DEBUG ((DEBUG_ERROR, "KMH-PCI-SEG: PCIe config base not found in DT\n"));
+  return mPciConfigBase;
+}
+
 
 /**
   This function  geted the config base of PCI device.
@@ -52,10 +119,12 @@ ASSERT (((A) & (0xffff0000f0000000ULL | (M))) == 0)
 STATIC
 UINT64
 PciSegmentLibGetConfigBase (
-  IN  UINT64      Address
+  VOID
   )
 {
-  UINT64 PciConfigBase = FixedPcdGet64 (PcdPciConfigBase);
+  UINT64 PciConfigBase;
+
+  PciConfigBase = KmhGetPciConfigBaseFromDt ();
   return PciConfigBase;
 }
 
@@ -78,8 +147,8 @@ PciSegmentLibReadWorker (
 {
   UINT64    Base;
 
-  Base = PciSegmentLibGetConfigBase (Address);
-  if (Base == 0xFFFFFFFF) {
+  Base = PciSegmentLibGetConfigBase ();
+  if (Base == MAX_UINT64) {
     return 0xFFFFFFFF;
   }
 
@@ -119,8 +188,8 @@ PciSegmentLibWriteWorker (
 {
   UINT64    Base;
 
-  Base = PciSegmentLibGetConfigBase (Address);
-  if (Base == 0xFFFFFFFF) {
+  Base = PciSegmentLibGetConfigBase ();
+  if (Base == MAX_UINT64) {
     return 0xFFFFFFFF;
   }
 

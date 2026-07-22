@@ -25,14 +25,6 @@
 #define KMH_PCI_RANGE_TYPE_MEM32        0x02000000U
 #define KMH_PCI_RANGE_TYPE_MEM64        0x03000000U
 #define KMH_PCI_RANGE_TYPE_MASK         0x03000000U
-#define KMH_PCIE_RC0_DBI_BASE           0x32000000ULL
-#define KMH_PCIE_ECAM_BASE              0x67FF0000ULL
-#define KMH_PCIE_MMIO32_CPU_BASE        0x60000000ULL
-#define KMH_PCIE_MMIO32_PCI_BASE        0x40000000ULL
-#define KMH_PCIE_MMIO32_SIZE            0x07FF0000ULL
-#define KMH_PCIE_MMIO64_CPU_BASE        0x4000000000ULL
-#define KMH_PCIE_MMIO64_PCI_BASE        0x4000000000ULL
-#define KMH_PCIE_MMIO64_SIZE            0x1000000000ULL
 #define KMH_UEFI_PCIE_SCAN_BUS_MAX      2
 #define KMH_PCIE_CFG0_CPU_OFFSET        0x00100000ULL
 #define KMH_PCIE_CFG1_CPU_OFFSET        0x00200000ULL
@@ -86,6 +78,7 @@ typedef struct {
 
 typedef struct {
   BOOLEAN  Found;
+  UINT64   DbiBase;
   UINT64   McfgBase;
   UINT8    BusMin;
   UINT8    BusMax;
@@ -153,6 +146,7 @@ KmhPcieGetRcInfoFromDt (
   }
 
   RcInfo->Found         = FALSE;
+  RcInfo->DbiBase       = 0;
   RcInfo->McfgBase      = 0;
   RcInfo->BusMin        = 0;
   RcInfo->BusMax        = 0xff;
@@ -180,14 +174,13 @@ KmhPcieGetRcInfoFromDt (
     UINT64        DbiBase;
 
     Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg", (CONST VOID **)&Property, &PropertySize);
-    if (EFI_ERROR (Status) || (PropertySize < 4 * sizeof (UINT32))) {
+    if (EFI_ERROR (Status) || (PropertySize < 8 * sizeof (UINT32))) {
       continue;
     }
 
-    DbiBase = KmhPcieFdtReadCells (Property, 2);
-    if (DbiBase != KMH_PCIE_RC0_DBI_BASE) {
-      continue;
-    }
+    DbiBase          = KmhPcieFdtReadCells (&Property[0], 2);
+    RcInfo->DbiBase  = DbiBase;
+    RcInfo->McfgBase = KmhPcieFdtReadCells (&Property[4], 2);
 
     Status = FdtClient->GetNodeProperty (FdtClient, Node, "bus-range", (CONST VOID **)&Property, &PropertySize);
     if (!EFI_ERROR (Status) && (PropertySize == 2 * sizeof (UINT32))) {
@@ -217,7 +210,6 @@ KmhPcieGetRcInfoFromDt (
           RcInfo->Mmio32PciBase = PciBase;
           RcInfo->Mmio32CpuBase = CpuBase;
           RcInfo->Mmio32Size    = Size;
-          RcInfo->McfgBase      = CpuBase + Size;
         } else if (Type == KMH_PCI_RANGE_TYPE_MEM64) {
           RcInfo->FoundMmio64   = TRUE;
           RcInfo->Mmio64PciBase = PciBase;
@@ -233,7 +225,8 @@ KmhPcieGetRcInfoFromDt (
     }
 
     RcInfo->Found = TRUE;
-    DEBUG ((DEBUG_INFO, "KMH-PCIE-DT: RC0 bus=%u-%u ecam=0x%lx mem32 pci=0x%lx cpu=0x%lx size=0x%lx\n",
+    DEBUG ((DEBUG_INFO, "KMH-PCIE-DT: RC0 dbi=0x%lx bus=%u-%u ecam=0x%lx mem32 pci=0x%lx cpu=0x%lx size=0x%lx\n",
+      RcInfo->DbiBase,
       RcInfo->BusMin,
       RcInfo->BusMax,
       RcInfo->McfgBase,
@@ -252,54 +245,58 @@ KmhPcieGetRcInfoFromDt (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_WARN, "KMH-PCIE-DT: RC0 node not found in DT: %r\n", Status));
+  DEBUG ((DEBUG_WARN, "KMH-PCIE-DT: usable RC0 node not found in DT: %r\n", Status));
   return EFI_NOT_FOUND;
 }
 
 STATIC
 VOID
 KmhPcieDbiRoWriteEnable (
+  IN UINT64  DbiBase,
   IN BOOLEAN Enable
   )
 {
   UINT32 Val;
 
-  Val = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCIE_MISC_CONTROL_1_OFF);
+  Val = MmioRead32 (DbiBase + PCIE_MISC_CONTROL_1_OFF);
   if (Enable) {
     Val |= PCIE_DBI_RO_WR_EN;
   } else {
     Val &= ~PCIE_DBI_RO_WR_EN;
   }
 
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCIE_MISC_CONTROL_1_OFF, Val);
+  MmioWrite32 (DbiBase + PCIE_MISC_CONTROL_1_OFF, Val);
 }
 
 STATIC
 VOID
 KmhPcieAtuWrite32 (
+  IN UINT64 DbiBase,
   IN UINT32 Index,
   IN UINT32 Offset,
   IN UINT32 Value
   )
 {
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCIE_ATU_VIEWPORT, Index);
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCIE_ATU_VIEWPORT_BASE + Offset, Value);
+  MmioWrite32 (DbiBase + PCIE_ATU_VIEWPORT, Index);
+  MmioWrite32 (DbiBase + PCIE_ATU_VIEWPORT_BASE + Offset, Value);
 }
 
 STATIC
 UINT32
 KmhPcieAtuRead32 (
+  IN UINT64 DbiBase,
   IN UINT32 Index,
   IN UINT32 Offset
   )
 {
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCIE_ATU_VIEWPORT, Index);
-  return MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCIE_ATU_VIEWPORT_BASE + Offset);
+  MmioWrite32 (DbiBase + PCIE_ATU_VIEWPORT, Index);
+  return MmioRead32 (DbiBase + PCIE_ATU_VIEWPORT_BASE + Offset);
 }
 
 STATIC
 VOID
 KmhPcieProgramOutboundAtu (
+  IN UINT64 DbiBase,
   IN UINT32 Index,
   IN UINT32 Type,
   IN UINT64 CpuBase,
@@ -314,16 +311,16 @@ KmhPcieProgramOutboundAtu (
 
   Limit = CpuBase + Size - 1;
 
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_LOWER_BASE, (UINT32)CpuBase);
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_UPPER_BASE, (UINT32)(CpuBase >> 32));
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_LIMIT, (UINT32)Limit);
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_LOWER_TARGET, (UINT32)PciBase);
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_UPPER_TARGET, (UINT32)(PciBase >> 32));
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_REGION_CTRL1, Type);
-  KmhPcieAtuWrite32 (Index, PCIE_ATU_REGION_CTRL2, PCIE_ATU_ENABLE | Ctrl2Extra);
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_LOWER_BASE, (UINT32)CpuBase);
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_UPPER_BASE, (UINT32)(CpuBase >> 32));
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_LIMIT, (UINT32)Limit);
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_LOWER_TARGET, (UINT32)PciBase);
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_UPPER_TARGET, (UINT32)(PciBase >> 32));
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_REGION_CTRL1, Type);
+  KmhPcieAtuWrite32 (DbiBase, Index, PCIE_ATU_REGION_CTRL2, PCIE_ATU_ENABLE | Ctrl2Extra);
 
   for (Retry = 0; Retry < 5; Retry++) {
-    Ctrl2 = KmhPcieAtuRead32 (Index, PCIE_ATU_REGION_CTRL2);
+    Ctrl2 = KmhPcieAtuRead32 (DbiBase, Index, PCIE_ATU_REGION_CTRL2);
     if ((Ctrl2 & PCIE_ATU_ENABLE) != 0) {
       break;
     }
@@ -337,21 +334,21 @@ KmhPcieProgramOutboundAtu (
     CpuBase,
     PciBase,
     Size,
-    KmhPcieAtuRead32 (Index, PCIE_ATU_REGION_CTRL2)
+    KmhPcieAtuRead32 (DbiBase, Index, PCIE_ATU_REGION_CTRL2)
     ));
 }
 
 STATIC
 VOID
 KmhPcieWaitForLink (
-  VOID
+  IN UINT64  DbiBase
   )
 {
   UINT32 Retry;
   UINT32 Debug1;
 
   for (Retry = 0; Retry < 100; Retry++) {
-    Debug1 = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCIE_PORT_DEBUG1);
+    Debug1 = MmioRead32 (DbiBase + PCIE_PORT_DEBUG1);
     if ((Debug1 & PCIE_PORT_DEBUG1_LINK_UP) != 0) {
       DEBUG ((DEBUG_INFO, "KMH-PCIE: link up debug1=0x%x retry=%u\n", Debug1, Retry));
       return;
@@ -370,90 +367,68 @@ KmhPcieInitRc0 (
   )
 {
   UINT32  Val;
-  UINT64  EcamBase;
-  UINT64  Mmio32CpuBase;
-  UINT64  Mmio32PciBase;
-  UINT64  Mmio32Size;
-  UINT64  Mmio64CpuBase;
-  UINT64  Mmio64PciBase;
-  UINT64  Mmio64Size;
 
-  EcamBase       = KMH_PCIE_ECAM_BASE;
-  Mmio32CpuBase  = KMH_PCIE_MMIO32_CPU_BASE;
-  Mmio32PciBase  = KMH_PCIE_MMIO32_PCI_BASE;
-  Mmio32Size     = KMH_PCIE_MMIO32_SIZE;
-  Mmio64CpuBase  = KMH_PCIE_MMIO64_CPU_BASE;
-  Mmio64PciBase  = KMH_PCIE_MMIO64_PCI_BASE;
-  Mmio64Size     = KMH_PCIE_MMIO64_SIZE;
-
-  if ((RcInfo != NULL) && RcInfo->Found && RcInfo->FoundMmio32) {
-    EcamBase      = RcInfo->McfgBase;
-    Mmio32CpuBase = RcInfo->Mmio32CpuBase;
-    Mmio32PciBase = RcInfo->Mmio32PciBase;
-    Mmio32Size    = RcInfo->Mmio32Size;
-    if (RcInfo->FoundMmio64) {
-      Mmio64CpuBase = RcInfo->Mmio64CpuBase;
-      Mmio64PciBase = RcInfo->Mmio64PciBase;
-      Mmio64Size    = RcInfo->Mmio64Size;
-    }
+  if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32) {
+    DEBUG ((DEBUG_ERROR, "KMH-PCIE: skip RC init, no DT PCIe resource\n"));
+    return;
   }
 
   DEBUG ((DEBUG_INFO, "KMH-PCIE: RC0 init dbi=0x%lx ecam=0x%lx mem32 cpu=0x%lx pci=0x%lx size=0x%lx mem64 cpu=0x%lx pci=0x%lx size=0x%lx\n",
-    KMH_PCIE_RC0_DBI_BASE,
-    EcamBase,
-    Mmio32CpuBase,
-    Mmio32PciBase,
-    Mmio32Size,
-    Mmio64CpuBase,
-    Mmio64PciBase,
-    Mmio64Size
+    RcInfo->DbiBase,
+    RcInfo->McfgBase,
+    RcInfo->Mmio32CpuBase,
+    RcInfo->Mmio32PciBase,
+    RcInfo->Mmio32Size,
+    RcInfo->FoundMmio64 ? RcInfo->Mmio64CpuBase : 0,
+    RcInfo->FoundMmio64 ? RcInfo->Mmio64PciBase : 0,
+    RcInfo->FoundMmio64 ? RcInfo->Mmio64Size : 0
     ));
 
-  KmhPcieDbiRoWriteEnable (TRUE);
+  KmhPcieDbiRoWriteEnable (RcInfo->DbiBase, TRUE);
 
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_BASE_ADDRESS_0, 0x00000004);
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_BASE_ADDRESS_1, 0x00000000);
+  MmioWrite32 (RcInfo->DbiBase + PCI_BASE_ADDRESS_0, 0x00000004);
+  MmioWrite32 (RcInfo->DbiBase + PCI_BASE_ADDRESS_1, 0x00000000);
 
-  Val = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCI_INTERRUPT_LINE);
+  Val = MmioRead32 (RcInfo->DbiBase + PCI_INTERRUPT_LINE);
   Val &= 0xFFFF00FF;
   Val |= 0x00000100;
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_INTERRUPT_LINE, Val);
+  MmioWrite32 (RcInfo->DbiBase + PCI_INTERRUPT_LINE, Val);
 
-  Val = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCI_PRIMARY_BUS);
+  Val = MmioRead32 (RcInfo->DbiBase + PCI_PRIMARY_BUS);
   Val &= 0xFF000000;
   Val |= 0x00FF0100;
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_PRIMARY_BUS, Val);
+  MmioWrite32 (RcInfo->DbiBase + PCI_PRIMARY_BUS, Val);
 
-  Val = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCI_COMMAND_OFFSET);
+  Val = MmioRead32 (RcInfo->DbiBase + PCI_COMMAND_OFFSET);
   Val &= 0xFFFF0000;
   Val |= PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER | PCI_COMMAND_SERR;
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_COMMAND_OFFSET, Val);
+  MmioWrite32 (RcInfo->DbiBase + PCI_COMMAND_OFFSET, Val);
 
-  MmioWrite16 (KMH_PCIE_RC0_DBI_BASE + PCI_CLASS_DEVICE, PCI_CLASS_BRIDGE_PCI);
+  MmioWrite16 (RcInfo->DbiBase + PCI_CLASS_DEVICE, PCI_CLASS_BRIDGE_PCI);
 
-  KmhPcieProgramOutboundAtu (0, PCIE_ATU_TYPE_CFG0, EcamBase, 0, KMH_PCIE_CFG0_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
-  KmhPcieProgramOutboundAtu (1, PCIE_ATU_TYPE_CFG0, EcamBase + KMH_PCIE_CFG0_CPU_OFFSET, KMH_PCIE_CFG0_PCI_BASE, KMH_PCIE_CFG0_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
-  KmhPcieProgramOutboundAtu (2, PCIE_ATU_TYPE_CFG1, EcamBase + KMH_PCIE_CFG1_CPU_OFFSET, KMH_PCIE_CFG1_PCI_BASE, KMH_PCIE_CFG1_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
-  KmhPcieProgramOutboundAtu (3, PCIE_ATU_TYPE_MEM, Mmio32CpuBase, Mmio32PciBase, Mmio32Size, 0);
-  if (Mmio64Size != 0) {
+  KmhPcieProgramOutboundAtu (RcInfo->DbiBase, 0, PCIE_ATU_TYPE_CFG0, RcInfo->McfgBase, 0, KMH_PCIE_CFG0_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
+  KmhPcieProgramOutboundAtu (RcInfo->DbiBase, 1, PCIE_ATU_TYPE_CFG0, RcInfo->McfgBase + KMH_PCIE_CFG0_CPU_OFFSET, KMH_PCIE_CFG0_PCI_BASE, KMH_PCIE_CFG0_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
+  KmhPcieProgramOutboundAtu (RcInfo->DbiBase, 2, PCIE_ATU_TYPE_CFG1, RcInfo->McfgBase + KMH_PCIE_CFG1_CPU_OFFSET, KMH_PCIE_CFG1_PCI_BASE, KMH_PCIE_CFG1_SIZE, PCIE_ATU_CFG_SHIFT_MODE_ENABLE);
+  KmhPcieProgramOutboundAtu (RcInfo->DbiBase, 3, PCIE_ATU_TYPE_MEM, RcInfo->Mmio32CpuBase, RcInfo->Mmio32PciBase, RcInfo->Mmio32Size, 0);
+  if (RcInfo->FoundMmio64 && (RcInfo->Mmio64Size != 0)) {
     DEBUG ((DEBUG_INFO, "KMH-PCIE: MEM64 ATU not programmed during UEFI PCI scan\n"));
   }
 
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCI_BASE_ADDRESS_0, 0);
-  MmioWrite16 (KMH_PCIE_RC0_DBI_BASE + PCI_CLASS_DEVICE, PCI_CLASS_BRIDGE_PCI);
+  MmioWrite32 (RcInfo->DbiBase + PCI_BASE_ADDRESS_0, 0);
+  MmioWrite16 (RcInfo->DbiBase + PCI_CLASS_DEVICE, PCI_CLASS_BRIDGE_PCI);
 
-  Val = MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCIE_LINK_WIDTH_SPEED_CONTROL);
+  Val = MmioRead32 (RcInfo->DbiBase + PCIE_LINK_WIDTH_SPEED_CONTROL);
   Val |= PORT_LOGIC_SPEED_CHANGE;
-  MmioWrite32 (KMH_PCIE_RC0_DBI_BASE + PCIE_LINK_WIDTH_SPEED_CONTROL, Val);
+  MmioWrite32 (RcInfo->DbiBase + PCIE_LINK_WIDTH_SPEED_CONTROL, Val);
 
-  KmhPcieDbiRoWriteEnable (FALSE);
-  KmhPcieWaitForLink ();
+  KmhPcieDbiRoWriteEnable (RcInfo->DbiBase, FALSE);
+  KmhPcieWaitForLink (RcInfo->DbiBase);
 
   DEBUG ((DEBUG_INFO, "KMH-PCIE: DBI vendor=0x%x class=0x%x cmd=0x%x bus=0x%x\n",
-    MmioRead32 (KMH_PCIE_RC0_DBI_BASE),
-    MmioRead32 (KMH_PCIE_RC0_DBI_BASE + 0x08),
-    MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCI_COMMAND_OFFSET),
-    MmioRead32 (KMH_PCIE_RC0_DBI_BASE + PCI_PRIMARY_BUS)
+    MmioRead32 (RcInfo->DbiBase),
+    MmioRead32 (RcInfo->DbiBase + 0x08),
+    MmioRead32 (RcInfo->DbiBase + PCI_COMMAND_OFFSET),
+    MmioRead32 (RcInfo->DbiBase + PCI_PRIMARY_BUS)
     ));
 }
 
@@ -467,21 +442,20 @@ STATIC PCI_ROOT_BRIDGE mRootBridge = {
   EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM,           // AllocationAttributes
   {
     // Bus
-    FixedPcdGet32 (PcdPciBusMin),
-    FixedPcdGet32 (PcdPciBusMax)
+    MAX_UINT64,
+    0
   }, {
     // Io
-    FixedPcdGet64 (PcdPciIoBase),
-    FixedPcdGet64 (PcdPciIoBase) + FixedPcdGet64 (PcdPciIoSize) - 1
+    MAX_UINT64,
+    0
   }, {
     // Mem
-    FixedPcdGet32 (PcdPciMmio32Base),
-    FixedPcdGet32 (PcdPciMmio32Base) + (FixedPcdGet32 (PcdPciMmio32Size) - 1)
-    //0x7FFFFFFF
+    MAX_UINT64,
+    0
   }, {
     // MemAbove4G
-    FixedPcdGet64 (PcdPciMmio64Size) ? FixedPcdGet64 (PcdPciMmio64Base) : MAX_UINT64,
-    FixedPcdGet64 (PcdPciMmio64Size) ? FixedPcdGet64 (PcdPciMmio64Base) + FixedPcdGet64 (PcdPciMmio64Size) - 1 : 0
+    MAX_UINT64,
+    0
   }, {
     // PMem
     MAX_UINT64,
@@ -501,7 +475,7 @@ KmhPcieApplyRootBridgeFromDt (
   )
 {
   if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32) {
-    DEBUG ((DEBUG_WARN, "KMH-PCIE-DT: use static PCD root bridge apertures\n"));
+    DEBUG ((DEBUG_ERROR, "KMH-PCIE-DT: no DT root bridge apertures\n"));
     return;
   }
 

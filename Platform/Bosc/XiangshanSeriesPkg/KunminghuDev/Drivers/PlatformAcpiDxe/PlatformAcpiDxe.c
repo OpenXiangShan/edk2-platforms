@@ -34,21 +34,6 @@
 #define KMH_PCI_RANGE_TYPE_MEM32        0x02000000U
 #define KMH_PCI_RANGE_TYPE_MEM64        0x03000000U
 #define KMH_PCI_RANGE_TYPE_MASK         0x03000000U
-#define KMH_PCIE_RC0_DBI_BASE           0x32000000ULL
-#define KMH_PCIE_RC1_DBI_BASE           0x40000000ULL
-#define KMH_PCIE_ECAM_BASE              0x67FF0000ULL
-#define KMH_PCIE_MMIO32_CPU_BASE        0x60000000ULL
-#define KMH_PCIE_MMIO32_PCI_BASE        0x40000000ULL
-#define KMH_PCIE_MMIO32_SIZE            0x07FF0000ULL
-#define KMH_PCIE_MMIO64_CPU_BASE        0x4000000000ULL
-#define KMH_PCIE_MMIO64_PCI_BASE        0x4000000000ULL
-#define KMH_PCIE_MMIO64_SIZE            0x1000000000ULL
-#define KMH_PCIE_RC1_MMIO32_CPU_BASE    0x70000000ULL
-#define KMH_PCIE_RC1_MMIO32_PCI_BASE    0x40000000ULL
-#define KMH_PCIE_RC1_MMIO32_SIZE        0x07FF0000ULL
-#define KMH_PCIE_RC1_MMIO64_CPU_BASE    0x6000000000ULL
-#define KMH_PCIE_RC1_MMIO64_PCI_BASE    0x6000000000ULL
-#define KMH_PCIE_RC1_MMIO64_SIZE        0x1000000000ULL
 #define KMH_UART0_BASE                  0x310B0000ULL
 #define KMH_UART0_ACPI_SIZE             0x00000100ULL
 #define KMH_UART0_CLOCK_FREQUENCY       50000000U
@@ -80,9 +65,7 @@
 #define KMH_RHCT_NODE_REVISION          1U
 #define KMH_RHCT_MMU_TYPE_SV48          1U
 #define KMH_PCIE_MAX_RC_COUNT           4U
-#define KMH_PCIE_CFG0_CPU_BASE          (KMH_PCIE_ECAM_BASE + 0x00100000ULL)
 #define KMH_PCIE_CFG0_SIZE              0x00100000ULL
-#define KMH_PCIE_CFG1_CPU_BASE          (KMH_PCIE_ECAM_BASE + 0x00200000ULL)
 #define KMH_PCIE_CFG1_SIZE              0x0FE00000ULL
 #define KMH_PCIE_CFG0_PCI_BASE          0x01000000ULL
 #define KMH_PCIE_CFG1_PCI_BASE          0x02000000ULL
@@ -410,7 +393,6 @@ KmhAcpiParsePcieRcNodeFromDt (
         RcInfo->Mmio32PciBase = PciBase;
         RcInfo->Mmio32CpuBase = CpuBase;
         RcInfo->Mmio32Size    = Size;
-        RcInfo->McfgBase      = CpuBase + Size;
       } else if (Type == KMH_PCI_RANGE_TYPE_MEM64) {
         RcInfo->FoundMmio64   = TRUE;
         RcInfo->Mmio64PciBase = PciBase;
@@ -418,6 +400,10 @@ KmhAcpiParsePcieRcNodeFromDt (
         RcInfo->Mmio64Size    = Size;
       }
     }
+  }
+
+  if (RcInfo->ConfigBase != 0) {
+    RcInfo->McfgBase = RcInfo->ConfigBase;
   }
 
   RcInfo->Found = TRUE;
@@ -504,7 +490,7 @@ KmhAcpiGetPcieRcInfoFromDt (
   }
 
   for (Index = 0; Index < RcCount; Index++) {
-    if (RcInfoArray[Index].DbiBase != KMH_PCIE_RC0_DBI_BASE) {
+    if (!RcInfoArray[Index].FoundMmio32 || (RcInfoArray[Index].McfgBase == 0)) {
       continue;
     }
 
@@ -563,83 +549,27 @@ KmhAcpiValidatePciCrsAgainstDt (
   IN CONST KMH_DT_PCIE_RC_INFO  *RcInfo
   )
 {
-  BOOLEAN  Matched;
-
   if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32) {
     DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: skip PCI0._CRS validation because cached DT RC0 info is unavailable\n"));
     return;
   }
 
-  Matched = TRUE;
-
-  if ((RcInfo->BusMin != 0) || (RcInfo->BusMax != 0xFF)) {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI0._CRS bus mismatch DSDT=0-255 DT=%u-%u\n",
-      RcInfo->BusMin,
-      RcInfo->BusMax
-      ));
-    Matched = FALSE;
-  }
-
-  if ((RcInfo->Mmio32PciBase != KMH_PCIE_MMIO32_PCI_BASE) ||
-      (RcInfo->Mmio32CpuBase != KMH_PCIE_MMIO32_CPU_BASE) ||
-      (RcInfo->Mmio32Size != KMH_PCIE_MMIO32_SIZE))
-  {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI0._CRS MEM32 mismatch DSDT pci=0x%Lx cpu=0x%Lx size=0x%Lx DT pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
-      KMH_PCIE_MMIO32_PCI_BASE,
-      KMH_PCIE_MMIO32_CPU_BASE,
-      KMH_PCIE_MMIO32_SIZE,
-      RcInfo->Mmio32PciBase,
-      RcInfo->Mmio32CpuBase,
-      RcInfo->Mmio32Size
-      ));
-    Matched = FALSE;
-  }
-
-  if (!RcInfo->FoundMmio64 ||
-      (RcInfo->Mmio64PciBase != KMH_PCIE_MMIO64_PCI_BASE) ||
-      (RcInfo->Mmio64CpuBase != KMH_PCIE_MMIO64_CPU_BASE) ||
-      (RcInfo->Mmio64Size != KMH_PCIE_MMIO64_SIZE))
-  {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI0._CRS MEM64 mismatch DSDT pci=0x%Lx cpu=0x%Lx size=0x%Lx DT found=%u pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
-      KMH_PCIE_MMIO64_PCI_BASE,
-      KMH_PCIE_MMIO64_CPU_BASE,
-      KMH_PCIE_MMIO64_SIZE,
-      RcInfo->FoundMmio64,
+  DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI0._CRS source is DT node=%d dbi=0x%Lx bus=%u-%u mem32 pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
+    RcInfo->Node,
+    RcInfo->DbiBase,
+    RcInfo->BusMin,
+    RcInfo->BusMax,
+    RcInfo->Mmio32PciBase,
+    RcInfo->Mmio32CpuBase,
+    RcInfo->Mmio32Size
+    ));
+  if (RcInfo->FoundMmio64) {
+    DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI0._CRS DT MEM64 pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
       RcInfo->Mmio64PciBase,
       RcInfo->Mmio64CpuBase,
       RcInfo->Mmio64Size
       ));
-    Matched = FALSE;
   }
-
-  if (Matched) {
-    DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI0._CRS matches cached DT RC0 windows\n"));
-  }
-}
-
-STATIC
-BOOLEAN
-KmhAcpiFindCollectedPcieRcByDbi (
-  IN  CONST KMH_DT_PCIE_RC_INFO  *RcInfoArray,
-  IN  UINTN                      RcCount,
-  IN  UINT64                     DbiBase,
-  OUT KMH_DT_PCIE_RC_INFO        *MatchedRcInfo
-  )
-{
-  UINTN  Index;
-
-  if ((RcInfoArray == NULL) || (MatchedRcInfo == NULL)) {
-    return FALSE;
-  }
-
-  for (Index = 0; Index < RcCount; Index++) {
-    if (RcInfoArray[Index].DbiBase == DbiBase) {
-      CopyMem (MatchedRcInfo, &RcInfoArray[Index], sizeof (*MatchedRcInfo));
-      return TRUE;
-    }
-  }
-
-  return FALSE;
 }
 
 STATIC
@@ -650,9 +580,7 @@ KmhAcpiValidatePci1CrsAgainstDt (
 {
   EFI_STATUS           Status;
   KMH_DT_PCIE_RC_INFO  RcInfoArray[KMH_PCIE_MAX_RC_COUNT];
-  KMH_DT_PCIE_RC_INFO  RcInfo;
   UINTN                RcCount;
-  BOOLEAN              Matched;
 
   if (FdtClient == NULL) {
     return;
@@ -664,65 +592,25 @@ KmhAcpiValidatePci1CrsAgainstDt (
     return;
   }
 
-  if (!KmhAcpiFindCollectedPcieRcByDbi (RcInfoArray, RcCount, KMH_PCIE_RC1_DBI_BASE, &RcInfo)) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: PCI1._CRS has no matching DT RC1 dbi=0x%Lx\n", KMH_PCIE_RC1_DBI_BASE));
+  if (RcCount < 2) {
+    DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI1._CRS validation skipped, runtime DT has %u PCIe RC\n", (UINT32)RcCount));
     return;
   }
 
-  Matched = TRUE;
-  if (RcInfo.BusMin != 0) {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI1._CRS bus minimum mismatch DSDT=0 DT=%u-%u\n",
-      RcInfo.BusMin,
-      RcInfo.BusMax
-      ));
-    Matched = FALSE;
-  } else if (RcInfo.BusMax != 0xFF) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: PCI1 DT bus range is already capped to %u-%u\n",
-      RcInfo.BusMin,
-      RcInfo.BusMax
-      ));
-  } else {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: PCI1._CRS bus range capped to 0-0 while runtime DT reports %u-%u\n",
-      RcInfo.BusMin,
-      RcInfo.BusMax
-      ));
-  }
-
-  if ((RcInfo.Mmio32PciBase != KMH_PCIE_RC1_MMIO32_PCI_BASE) ||
-      (RcInfo.Mmio32CpuBase != KMH_PCIE_RC1_MMIO32_CPU_BASE) ||
-      (RcInfo.Mmio32Size != KMH_PCIE_RC1_MMIO32_SIZE))
-  {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI1._CRS MEM32 mismatch DSDT pci=0x%Lx cpu=0x%Lx size=0x%Lx DT pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
-      KMH_PCIE_RC1_MMIO32_PCI_BASE,
-      KMH_PCIE_RC1_MMIO32_CPU_BASE,
-      KMH_PCIE_RC1_MMIO32_SIZE,
-      RcInfo.Mmio32PciBase,
-      RcInfo.Mmio32CpuBase,
-      RcInfo.Mmio32Size
-      ));
-    Matched = FALSE;
-  }
-
-  if (!RcInfo.FoundMmio64 ||
-      (RcInfo.Mmio64PciBase != KMH_PCIE_RC1_MMIO64_PCI_BASE) ||
-      (RcInfo.Mmio64CpuBase != KMH_PCIE_RC1_MMIO64_CPU_BASE) ||
-      (RcInfo.Mmio64Size != KMH_PCIE_RC1_MMIO64_SIZE))
-  {
-    DEBUG ((DEBUG_ERROR, "KMH-DT-ACPI: PCI1._CRS MEM64 mismatch DSDT pci=0x%Lx cpu=0x%Lx size=0x%Lx DT found=%u pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
-      KMH_PCIE_RC1_MMIO64_PCI_BASE,
-      KMH_PCIE_RC1_MMIO64_CPU_BASE,
-      KMH_PCIE_RC1_MMIO64_SIZE,
-      RcInfo.FoundMmio64,
-      RcInfo.Mmio64PciBase,
-      RcInfo.Mmio64CpuBase,
-      RcInfo.Mmio64Size
-      ));
-    Matched = FALSE;
-  }
-
-  if (Matched) {
-    DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI1._CRS matches runtime DT RC1 windows with bus range capped for ECAM conflict avoidance\n"));
-  }
+  DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCI1._CRS source is DT node=%d dbi=0x%Lx bus=%u-%u mem32 found=%u pci=0x%Lx cpu=0x%Lx size=0x%Lx mem64 found=%u pci=0x%Lx cpu=0x%Lx size=0x%Lx\n",
+    RcInfoArray[1].Node,
+    RcInfoArray[1].DbiBase,
+    RcInfoArray[1].BusMin,
+    RcInfoArray[1].BusMax,
+    RcInfoArray[1].FoundMmio32,
+    RcInfoArray[1].Mmio32PciBase,
+    RcInfoArray[1].Mmio32CpuBase,
+    RcInfoArray[1].Mmio32Size,
+    RcInfoArray[1].FoundMmio64,
+    RcInfoArray[1].Mmio64PciBase,
+    RcInfoArray[1].Mmio64CpuBase,
+    RcInfoArray[1].Mmio64Size
+    ));
 }
 
 STATIC
@@ -2329,14 +2217,8 @@ KmhAcpiInstallMcfgFromDt (
   }
 
   if (RcCount == 0) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-MCFG: use fallback static MCFG base=0x%Lx bus=0-255\n", KMH_PCIE_ECAM_BASE));
-    ZeroMem (&RcInfoArray[0], sizeof (RcInfoArray[0]));
-    RcInfoArray[0].Found       = TRUE;
-    RcInfoArray[0].FoundMmio32 = TRUE;
-    RcInfoArray[0].McfgBase    = KMH_PCIE_ECAM_BASE;
-    RcInfoArray[0].BusMin      = 0;
-    RcInfoArray[0].BusMax      = 0xff;
-    RcCount = 1;
+    DEBUG ((DEBUG_ERROR, "KMH-DT-MCFG: no DT PCIe RC available for MCFG\n"));
+    return EFI_NOT_FOUND;
   }
 
   ZeroMem (&Mcfg, sizeof (Mcfg));
@@ -2356,7 +2238,7 @@ KmhAcpiInstallMcfgFromDt (
 
     BusMin = RcInfoArray[Index].BusMin;
     BusMax = RcInfoArray[Index].BusMax;
-    if ((RcInfoArray[Index].DbiBase != KMH_PCIE_RC0_DBI_BASE) &&
+    if ((Index > 0) &&
         (RcInfoArray[Index].ConfigSize > 0) &&
         (RcInfoArray[Index].ConfigSize < MultU64x32 ((UINT64)(BusMax - BusMin + 1), KMH_PCI_ECAM_BUS_SIZE)))
     {
@@ -2449,11 +2331,8 @@ KmhAcpiInstallEcamReservationFromDt (
 
   Status = KmhAcpiGetPcieRcInfoFromDt (&RcInfo);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ECAM: use fallback static ECAM base=0x%Lx bus=0-255\n", KMH_PCIE_ECAM_BASE));
-    RcInfo.Found    = TRUE;
-    RcInfo.McfgBase = KMH_PCIE_ECAM_BASE;
-    RcInfo.BusMin   = 0;
-    RcInfo.BusMax   = 0xff;
+    DEBUG ((DEBUG_ERROR, "KMH-DT-ECAM: no DT ECAM resource for reservation SSDT: %r\n", Status));
+    return Status;
   }
 
   if (RcInfo.BusMax < RcInfo.BusMin) {
@@ -2621,19 +2500,12 @@ STATIC
 VOID
 KmhAcpiPcieInitRc (
   IN CONST CHAR8                *RcName,
-  IN UINT64                     DbiBase,
   IN CONST KMH_DT_PCIE_RC_INFO  *RcInfo,
-  IN BOOLEAN                    EnableCfg1,
-  IN UINT64                     FallbackEcamBase,
-  IN UINT64                     FallbackMmio32CpuBase,
-  IN UINT64                     FallbackMmio32PciBase,
-  IN UINT64                     FallbackMmio32Size,
-  IN UINT64                     FallbackMmio64CpuBase,
-  IN UINT64                     FallbackMmio64PciBase,
-  IN UINT64                     FallbackMmio64Size
+  IN BOOLEAN                    EnableCfg1
   )
 {
   UINT32  Val;
+  UINT64  DbiBase;
   UINT64  EcamBase;
   UINT64  Mmio32CpuBase;
   UINT64  Mmio32PciBase;
@@ -2643,26 +2515,19 @@ KmhAcpiPcieInitRc (
   UINT64  Mmio64Size;
   UINT32  Vendor;
 
-  EcamBase       = FallbackEcamBase;
-  Mmio32CpuBase  = FallbackMmio32CpuBase;
-  Mmio32PciBase  = FallbackMmio32PciBase;
-  Mmio32Size     = FallbackMmio32Size;
-  Mmio64CpuBase  = FallbackMmio64CpuBase;
-  Mmio64PciBase  = FallbackMmio64PciBase;
-  Mmio64Size     = FallbackMmio64Size;
-
-  if ((RcInfo != NULL) && RcInfo->Found && RcInfo->FoundMmio32) {
-    EcamBase      = RcInfo->McfgBase;
-    Mmio32CpuBase = RcInfo->Mmio32CpuBase;
-    Mmio32PciBase = RcInfo->Mmio32PciBase;
-    Mmio32Size    = RcInfo->Mmio32Size;
-
-    if (RcInfo->FoundMmio64) {
-      Mmio64CpuBase = RcInfo->Mmio64CpuBase;
-      Mmio64PciBase = RcInfo->Mmio64PciBase;
-      Mmio64Size    = RcInfo->Mmio64Size;
-    }
+  if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32 || (RcInfo->DbiBase == 0) || (RcInfo->McfgBase == 0)) {
+    DEBUG ((DEBUG_ERROR, "KMH-ACPI-PCIE: %a skip hardware init, DT PCIe resource incomplete\n", RcName));
+    return;
   }
+
+  DbiBase       = RcInfo->DbiBase;
+  EcamBase      = RcInfo->McfgBase;
+  Mmio32CpuBase = RcInfo->Mmio32CpuBase;
+  Mmio32PciBase = RcInfo->Mmio32PciBase;
+  Mmio32Size    = RcInfo->Mmio32Size;
+  Mmio64CpuBase = RcInfo->FoundMmio64 ? RcInfo->Mmio64CpuBase : 0;
+  Mmio64PciBase = RcInfo->FoundMmio64 ? RcInfo->Mmio64PciBase : 0;
+  Mmio64Size    = RcInfo->FoundMmio64 ? RcInfo->Mmio64Size : 0;
 
   DEBUG ((DEBUG_INFO, "KMH-ACPI-PCIE: %a init dbi=0x%lx ecam=0x%lx mem32 cpu=0x%lx pci=0x%lx size=0x%lx mem64 cpu=0x%lx pci=0x%lx size=0x%lx\n",
     RcName,
@@ -2751,16 +2616,8 @@ KmhAcpiPcieInitRc0 (
 {
   KmhAcpiPcieInitRc (
     "RC0",
-    KMH_PCIE_RC0_DBI_BASE,
     RcInfo,
-    TRUE,
-    KMH_PCIE_ECAM_BASE,
-    KMH_PCIE_MMIO32_CPU_BASE,
-    KMH_PCIE_MMIO32_PCI_BASE,
-    KMH_PCIE_MMIO32_SIZE,
-    KMH_PCIE_MMIO64_CPU_BASE,
-    KMH_PCIE_MMIO64_PCI_BASE,
-    KMH_PCIE_MMIO64_SIZE
+    TRUE
     );
 }
 
@@ -2773,10 +2630,11 @@ KmhAcpiPcieExitBootServicesNotify (
   )
 {
   if (EFI_ERROR (mKmhAcpiPcieRcInfoStatus)) {
-    DEBUG ((DEBUG_WARN, "KMH-ACPI-PCIE: use static RC0 windows at ExitBootServices: %r\n", mKmhAcpiPcieRcInfoStatus));
+    DEBUG ((DEBUG_ERROR, "KMH-ACPI-PCIE: skip RC0 init at ExitBootServices, DT RC info unavailable: %r\n", mKmhAcpiPcieRcInfoStatus));
+    return;
   }
 
-  KmhAcpiPcieInitRc0 (EFI_ERROR (mKmhAcpiPcieRcInfoStatus) ? NULL : &mKmhAcpiPcieRcInfo);
+  KmhAcpiPcieInitRc0 (&mKmhAcpiPcieRcInfo);
   DEBUG ((DEBUG_INFO, "KMH-ACPI-PCIE: RC1 init disabled by platform policy\n"));
 }
 
@@ -3091,4 +2949,3 @@ PlatformAcpiDriverEntryPoint (
 
   return Status;
 }
-

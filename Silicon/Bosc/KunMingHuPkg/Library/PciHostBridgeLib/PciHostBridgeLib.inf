@@ -43,15 +43,3 @@
 
 [Protocols]
   gFdtClientProtocolGuid
-
-[FixedPcd]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigSize
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMin
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoBase
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoSize
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size

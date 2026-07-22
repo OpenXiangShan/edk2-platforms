@@ -8,7 +8,6 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Protocol/FdtClient.h>
@@ -16,7 +15,6 @@
 #define KMH_PCI_RANGE_TYPE_MEM32      0x02000000U
 #define KMH_PCI_RANGE_TYPE_MEM64      0x03000000U
 #define KMH_PCI_RANGE_TYPE_MASK       0x03000000U
-#define KMH_PCIE_RC0_DBI_BASE         0x32000000ULL
 #define KMH_PCIE_CFG0_SIZE            0x00100000ULL
 #define KMH_BOOTARGS_CHUNK_SIZE       96
 
@@ -38,6 +36,9 @@ typedef struct {
   UINT64     Mmio64Size;
   BOOLEAN    FoundDbiBase;
   UINT64     DbiBase;
+  BOOLEAN    FoundConfigBase;
+  UINT64     ConfigBase;
+  UINT64     ConfigSize;
 } KMH_FDT_PCIE_INFO;
 
 STATIC
@@ -272,17 +273,17 @@ KmhFdtPrintPcieAcpiCandidate (
   UINT64  Mmio64Translation;
   UINT64  McfgBase;
 
-  if ((Info == NULL) || !Info->FoundDbiBase || (Info->DbiBase != KMH_PCIE_RC0_DBI_BASE)) {
+  if ((Info == NULL) || !Info->FoundDbiBase) {
     return;
   }
 
   Mmio32Translation = Info->FoundMmio32 ? Info->Mmio32CpuBase - Info->Mmio32PciBase : 0;
   Mmio64Translation = Info->FoundMmio64 ? Info->Mmio64CpuBase - Info->Mmio64PciBase : 0;
-  McfgBase          = Info->FoundMmio32 ? Info->Mmio32CpuBase + Info->Mmio32Size : 0;
+  McfgBase          = Info->FoundConfigBase ? Info->ConfigBase : 0;
 
   DEBUG ((
     DEBUG_INFO,
-    "KMH-DT-ACPI: PCIe RC0 node=%d MCFG base=0x%Lx segment=0 bus=%u-%u cfg0-size=0x%Lx\n",
+    "KMH-DT-ACPI: PCIe node=%d MCFG base=0x%Lx segment=0 bus=%u-%u cfg0-size=0x%Lx\n",
     Node,
     McfgBase,
     Info->FoundBusRange ? Info->BusMin : 0,
@@ -293,7 +294,7 @@ KmhFdtPrintPcieAcpiCandidate (
   if (Info->FoundBusRange) {
     DEBUG ((
       DEBUG_INFO,
-      "KMH-DT-ACPI: PCIe RC0 _CRS WordBusNumber min=0x%x max=0x%x len=0x%x\n",
+      "KMH-DT-ACPI: PCIe _CRS WordBusNumber min=0x%x max=0x%x len=0x%x\n",
       Info->BusMin,
       Info->BusMax,
       Info->BusMax - Info->BusMin + 1
@@ -303,7 +304,7 @@ KmhFdtPrintPcieAcpiCandidate (
   if (Info->FoundMmio32) {
     DEBUG ((
       DEBUG_INFO,
-      "KMH-DT-ACPI: PCIe RC0 _CRS DWordMemory pci=0x%Lx-0x%Lx cpu=0x%Lx-0x%Lx trans=0x%Lx len=0x%Lx\n",
+      "KMH-DT-ACPI: PCIe _CRS DWordMemory pci=0x%Lx-0x%Lx cpu=0x%Lx-0x%Lx trans=0x%Lx len=0x%Lx\n",
       Info->Mmio32PciBase,
       Info->Mmio32PciBase + Info->Mmio32Size - 1,
       Info->Mmio32CpuBase,
@@ -316,7 +317,7 @@ KmhFdtPrintPcieAcpiCandidate (
   if (Info->FoundMmio64) {
     DEBUG ((
       DEBUG_INFO,
-      "KMH-DT-ACPI: PCIe RC0 _CRS QWordMemory pci=0x%Lx-0x%Lx cpu=0x%Lx-0x%Lx trans=0x%Lx len=0x%Lx\n",
+      "KMH-DT-ACPI: PCIe _CRS QWordMemory pci=0x%Lx-0x%Lx cpu=0x%Lx-0x%Lx trans=0x%Lx len=0x%Lx\n",
       Info->Mmio64PciBase,
       Info->Mmio64PciBase + Info->Mmio64Size - 1,
       Info->Mmio64CpuBase,
@@ -326,26 +327,11 @@ KmhFdtPrintPcieAcpiCandidate (
       ));
   }
 
-  DEBUG ((
-    DEBUG_INFO,
-    "KMH-DT-ACPI: PCIe RC0 current PCD MCFG=0x%Lx bus=%u-%u mmio32-cpu=0x%Lx size=0x%Lx trans=0x%Lx mmio64-cpu=0x%Lx size=0x%Lx\n",
-    FixedPcdGet64 (PcdPciConfigBase),
-    FixedPcdGet32 (PcdPciBusMin),
-    FixedPcdGet32 (PcdPciBusMax),
-    FixedPcdGet32 (PcdPciMmio32Base),
-    FixedPcdGet32 (PcdPciMmio32Size),
-    FixedPcdGet64 (PcdPciMmio32Translation),
-    FixedPcdGet64 (PcdPciMmio64Base),
-    FixedPcdGet64 (PcdPciMmio64Size)
+  DEBUG ((DEBUG_INFO, "KMH-DT-ACPI: PCIe config window found=%u base=0x%Lx size=0x%Lx\n",
+    Info->FoundConfigBase,
+    Info->ConfigBase,
+    Info->ConfigSize
     ));
-
-  if ((McfgBase != 0) && (McfgBase != FixedPcdGet64 (PcdPciConfigBase))) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: PCIe RC0 MCFG base differs from current ACPI/PCD\n"));
-  }
-
-  if (Info->FoundMmio64 && (FixedPcdGet64 (PcdPciMmio64Size) == 0)) {
-    DEBUG ((DEBUG_WARN, "KMH-DT-ACPI: PCIe RC0 DT has MEM64 but current ACPI/PCD disables MEM64\n"));
-  }
 }
 
 STATIC
@@ -368,6 +354,11 @@ KmhFdtValidatePcieNode (
   if (!EFI_ERROR (Status) && (PropertySize >= 4 * sizeof (UINT32))) {
     Info.DbiBase      = KmhFdtReadCells (Property, 2);
     Info.FoundDbiBase = TRUE;
+    if (PropertySize >= 8 * sizeof (UINT32)) {
+      Info.ConfigBase      = KmhFdtReadCells (&Property[4], 2);
+      Info.ConfigSize      = KmhFdtReadCells (&Property[6], 2);
+      Info.FoundConfigBase = TRUE;
+    }
   }
 
   Status = FdtClient->GetNodeProperty (FdtClient, Node, "bus-range", (CONST VOID **)&Property, &PropertySize);
@@ -377,7 +368,7 @@ KmhFdtValidatePcieNode (
     Info.FoundBusRange = TRUE;
   }
 
-  DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d dbi=0x%Lx mode=%a\n", Node, Info.DbiBase, (Info.FoundDbiBase && (Info.DbiBase == KMH_PCIE_RC0_DBI_BASE)) ? "strict-rc0" : "info-only"));
+  DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d dbi=0x%Lx config=0x%Lx/0x%Lx\n", Node, Info.DbiBase, Info.ConfigBase, Info.ConfigSize));
 
   Status = FdtClient->GetNodeProperty (FdtClient, Node, "ranges", (CONST VOID **)&Property, &PropertySize);
   if (!EFI_ERROR (Status)) {
@@ -414,30 +405,19 @@ KmhFdtValidatePcieNode (
   }
 
   if (Info.FoundBusRange) {
-    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d bus-range=%u-%u PCD=%u-%u\n", Node, Info.BusMin, Info.BusMax, FixedPcdGet32 (PcdPciBusMin), FixedPcdGet32 (PcdPciBusMax)));
-    if (Info.FoundDbiBase && (Info.DbiBase == KMH_PCIE_RC0_DBI_BASE) &&
-        ((Info.BusMin != FixedPcdGet32 (PcdPciBusMin)) || (Info.BusMax != FixedPcdGet32 (PcdPciBusMax))))
-    {
-      DEBUG ((DEBUG_WARN, "KMH-FDT-CHECK: PCIe RC0 bus-range mismatch with ACPI/PCD\n"));
-    }
+    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d bus-range=%u-%u\n", Node, Info.BusMin, Info.BusMax));
   } else {
     DEBUG ((DEBUG_WARN, "KMH-FDT-CHECK: PCIe node=%d has no bus-range\n", Node));
   }
 
   if (Info.FoundMmio32) {
-    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d mmio32 cpu=0x%Lx pci=0x%Lx size=0x%Lx PCD cpu=0x%Lx size=0x%Lx trans=0x%Lx\n", Node, Info.Mmio32CpuBase, Info.Mmio32PciBase, Info.Mmio32Size, FixedPcdGet32 (PcdPciMmio32Base), FixedPcdGet32 (PcdPciMmio32Size), FixedPcdGet64 (PcdPciMmio32Translation)));
-    if (Info.FoundDbiBase && (Info.DbiBase == KMH_PCIE_RC0_DBI_BASE) &&
-        ((Info.Mmio32CpuBase != FixedPcdGet32 (PcdPciMmio32Base)) ||
-         (Info.Mmio32Size != FixedPcdGet32 (PcdPciMmio32Size))))
-    {
-      DEBUG ((DEBUG_WARN, "KMH-FDT-CHECK: PCIe RC0 MMIO32 mismatch with ACPI/PCD\n"));
-    }
+    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d mmio32 cpu=0x%Lx pci=0x%Lx size=0x%Lx\n", Node, Info.Mmio32CpuBase, Info.Mmio32PciBase, Info.Mmio32Size));
   } else {
     DEBUG ((DEBUG_WARN, "KMH-FDT-CHECK: PCIe node=%d has no MEM32 range\n", Node));
   }
 
   if (Info.FoundMmio64) {
-    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d mmio64 cpu=0x%Lx pci=0x%Lx size=0x%Lx PCD cpu=0x%Lx size=0x%Lx\n", Node, Info.Mmio64CpuBase, Info.Mmio64PciBase, Info.Mmio64Size, FixedPcdGet64 (PcdPciMmio64Base), FixedPcdGet64 (PcdPciMmio64Size)));
+    DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d mmio64 cpu=0x%Lx pci=0x%Lx size=0x%Lx\n", Node, Info.Mmio64CpuBase, Info.Mmio64PciBase, Info.Mmio64Size));
   } else {
     DEBUG ((DEBUG_INFO, "KMH-FDT-CHECK: PCIe node=%d has no MEM64 range\n", Node));
   }

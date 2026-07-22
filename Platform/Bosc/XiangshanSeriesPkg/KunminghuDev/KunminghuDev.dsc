@@ -274,24 +274,8 @@
   gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSupported|TRUE
 
 [PcdsFixedAtBuild]
-  #
-  # XILINX PCI Root Complex
-  #
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x67ff0000
   gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
- gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x20000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase|0x67ff0000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigSize|0x10000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMin|0
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax|0xff
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoBase|0x00000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciIoSize|0xf00000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base|0x60000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size|0x07ff0000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base|0x4000000000
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size|0x1000000000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
@@ -316,14 +300,6 @@
 !ifdef $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
-
-  # RamDisk image region loaded by QEMU loader.
-  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskBase|0x3E0000000
-  # Use a non-4K-multiple size so RamDiskDxe falls back to 512-byte BlockIo.
-  gEfiBoscSiliconTokenSpaceGuid.PcdRamDiskSize|0x7FF00000
-  # Initrd image region loaded by QEMU loader.
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdBase|0x460000000
-  gEfiBoscSiliconTokenSpaceGuid.PcdInitrdSize|0x028D8800
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot

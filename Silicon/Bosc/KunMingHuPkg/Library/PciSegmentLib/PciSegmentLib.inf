@@ -12,7 +12,7 @@
   INF_VERSION                    = 0x0001001b
   BASE_NAME                      = PciSegmentLib
   FILE_GUID                      = B0DD53D5-30C6-48CB-849D-BEB935B57D78
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PciSegmentLib
 
@@ -20,6 +20,7 @@
   PciSegmentLib.c
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
 
@@ -27,6 +28,7 @@
   BaseLib
   DebugLib
   IoLib
+  UefiBootServicesTableLib
 
-[FixedPcd]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase
+[Protocols]
+  gFdtClientProtocolGuid

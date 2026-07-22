@@ -24,23 +24,12 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
 
 [Protocols]
   gFdtClientProtocolGuid
-
-[FixedPcd]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMin
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciBusMax
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciConfigBase
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Base
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio32Size
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Base
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPciMmio64Size
-  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation
 
 [Depex]
   gFdtClientProtocolGuid
