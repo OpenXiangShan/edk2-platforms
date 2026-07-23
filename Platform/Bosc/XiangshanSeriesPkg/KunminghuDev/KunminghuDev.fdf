@@ -129,6 +129,7 @@ INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
 INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
+INF  Silicon/Bosc/KunMingHuPkg/Application/BdsLoaderTool/BdsLoaderTool.inf
 
 #
 # Network modules

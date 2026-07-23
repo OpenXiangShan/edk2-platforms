@@ -14,6 +14,10 @@ EFI_GUID  mUefiShellFileGuid = {
   0x7C04A583, 0x9E3E, 0x4f1c, { 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 };
 
+EFI_GUID  mKmhBdsLoaderToolFileGuid = {
+  0x4A4B2A66, 0x9E59, 0x4C62, { 0xBD, 0x69, 0x7C, 0x93, 0x2B, 0x9F, 0x6C, 0x41 }
+};
+
 typedef struct {
   EFI_GUID       FileGuid;
   CONST CHAR8    *Name;
@@ -449,6 +453,44 @@ PlatformFindLoadOption (
   return -1;
 }
 
+STATIC
+INTN
+EFIAPI
+PlatformCompareKmhBdsLoaderFirst (
+  IN CONST VOID  *Buffer1,
+  IN CONST VOID  *Buffer2
+  )
+{
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Option1;
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Option2;
+  BOOLEAN                             Option1IsKmhBdsLoader;
+  BOOLEAN                             Option2IsKmhBdsLoader;
+
+  Option1 = (CONST EFI_BOOT_MANAGER_LOAD_OPTION *)Buffer1;
+  Option2 = (CONST EFI_BOOT_MANAGER_LOAD_OPTION *)Buffer2;
+
+  Option1IsKmhBdsLoader = (BOOLEAN)(StrCmp (Option1->Description, L"KMH BdsLoaderTool") == 0);
+  Option2IsKmhBdsLoader = (BOOLEAN)(StrCmp (Option2->Description, L"KMH BdsLoaderTool") == 0);
+
+  if (Option1IsKmhBdsLoader && !Option2IsKmhBdsLoader) {
+    return -1;
+  }
+
+  if (!Option1IsKmhBdsLoader && Option2IsKmhBdsLoader) {
+    return 1;
+  }
+
+  if (Option1->OptionNumber < Option2->OptionNumber) {
+    return -1;
+  }
+
+  if (Option1->OptionNumber > Option2->OptionNumber) {
+    return 1;
+  }
+
+  return 0;
+}
+
 /**
   Register a boot option using a file GUID in the FV.
 
@@ -589,6 +631,15 @@ PlatformBootManagerBeforeConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (&mUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  PlatformRegisterFvBootOption (
+    &mKmhBdsLoaderToolFileGuid,
+    L"KMH BdsLoaderTool",
+    LOAD_OPTION_ACTIVE
+    );
+  EfiBootManagerSortLoadOptionVariable (
+    LoadOptionTypeBoot,
+    PlatformCompareKmhBdsLoaderFirst
+    );
 }
 
 /**

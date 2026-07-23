@@ -376,7 +376,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
 
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0x0001
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0x000A
 
   # Set video resolution for text setup.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
