@@ -72,6 +72,7 @@ KmhGetPciConfigBaseFromDt (
   EFI_STATUS           Status;
   FDT_CLIENT_PROTOCOL  *FdtClient;
   INT32                Node;
+  CONST CHAR8          *MatchString;
 
   if (mPciConfigBaseCached) {
     return mPciConfigBase;
@@ -85,9 +86,16 @@ KmhGetPciConfigBaseFromDt (
     return mPciConfigBase;
   }
 
-  for (Status = FdtClient->FindCompatibleNode (FdtClient, "snps,dw-pcie", &Node);
+  MatchString = "snps,dw-pcie";
+  Status = FdtClient->FindCompatibleNode (FdtClient, MatchString, &Node);
+  if (EFI_ERROR (Status)) {
+    MatchString = "pci";
+    Status = FdtClient->FindCompatibleNode (FdtClient, MatchString, &Node);
+  }
+
+  for (;
        !EFI_ERROR (Status);
-       Status = FdtClient->FindNextCompatibleNode (FdtClient, "snps,dw-pcie", Node, &Node))
+       Status = FdtClient->FindNextCompatibleNode (FdtClient, MatchString, Node, &Node))
   {
     CONST UINT32  *Reg;
     UINT32        RegSize;

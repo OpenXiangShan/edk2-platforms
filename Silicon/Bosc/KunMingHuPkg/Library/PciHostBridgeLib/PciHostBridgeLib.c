@@ -78,6 +78,7 @@ typedef struct {
 
 typedef struct {
   BOOLEAN  Found;
+  BOOLEAN  IsDwPcie;
   UINT64   DbiBase;
   UINT64   McfgBase;
   UINT8    BusMin;
@@ -140,12 +141,15 @@ KmhPcieGetRcInfoFromDt (
   EFI_STATUS           Status;
   FDT_CLIENT_PROTOCOL  *FdtClient;
   INT32                Node;
+  CONST CHAR8          *MatchString;
+  BOOLEAN              IsDwPcie;
 
   if (RcInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   RcInfo->Found         = FALSE;
+  RcInfo->IsDwPcie      = FALSE;
   RcInfo->DbiBase       = 0;
   RcInfo->McfgBase      = 0;
   RcInfo->BusMin        = 0;
@@ -165,9 +169,18 @@ KmhPcieGetRcInfoFromDt (
     return Status;
   }
 
-  for (Status = FdtClient->FindCompatibleNode (FdtClient, "snps,dw-pcie", &Node);
+  MatchString = "snps,dw-pcie";
+  IsDwPcie    = TRUE;
+  Status = FdtClient->FindCompatibleNode (FdtClient, MatchString, &Node);
+  if (EFI_ERROR (Status)) {
+    MatchString = "pci";
+    IsDwPcie    = FALSE;
+    Status = FdtClient->FindCompatibleNode (FdtClient, MatchString, &Node);
+  }
+
+  for (;
        !EFI_ERROR (Status);
-       Status = FdtClient->FindNextCompatibleNode (FdtClient, "snps,dw-pcie", Node, &Node))
+       Status = FdtClient->FindNextCompatibleNode (FdtClient, MatchString, Node, &Node))
   {
     CONST UINT32  *Property;
     UINT32        PropertySize;
@@ -225,6 +238,7 @@ KmhPcieGetRcInfoFromDt (
     }
 
     RcInfo->Found = TRUE;
+    RcInfo->IsDwPcie = IsDwPcie;
     DEBUG ((DEBUG_INFO, "KMH-PCIE-DT: RC0 dbi=0x%lx bus=%u-%u ecam=0x%lx mem32 pci=0x%lx cpu=0x%lx size=0x%lx\n",
       RcInfo->DbiBase,
       RcInfo->BusMin,
@@ -370,6 +384,11 @@ KmhPcieInitRc0 (
 
   if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32) {
     DEBUG ((DEBUG_ERROR, "KMH-PCIE: skip RC init, no DT PCIe resource\n"));
+    return;
+  }
+
+  if (!RcInfo->IsDwPcie) {
+    DEBUG ((DEBUG_INFO, "KMH-PCIE: skip DW RC init, DT node is generic device_type=\"pci\"\n"));
     return;
   }
 

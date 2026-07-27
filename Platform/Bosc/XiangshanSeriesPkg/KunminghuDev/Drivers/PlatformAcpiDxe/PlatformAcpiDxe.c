@@ -249,6 +249,7 @@ typedef struct {
 #pragma pack ()
 typedef struct {
   BOOLEAN  Found;
+  BOOLEAN  IsDwPcie;
   INT32    Node;
   UINT64   DbiBase;
   UINT64   DbiSize;
@@ -270,6 +271,29 @@ typedef struct {
 STATIC KMH_DT_PCIE_RC_INFO mKmhAcpiPcieRcInfo;
 STATIC KMH_DT_PCIE_RC_INFO mKmhAcpiPcieRcInfoArray[KMH_PCIE_MAX_RC_COUNT];
 STATIC UINTN mKmhAcpiPcieRcCount;
+
+STATIC
+BOOLEAN
+KmhAcpiPcieRcNodeAlreadyCollected (
+  IN KMH_DT_PCIE_RC_INFO  *RcInfo,
+  IN UINTN                RcCount,
+  IN INT32                Node
+  )
+{
+  UINTN  Index;
+
+  if (RcInfo == NULL) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < RcCount; Index++) {
+    if (RcInfo[Index].Node == Node) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 #if KMH_ENABLE_ECAM_RESERVATION_SSDT
 STATIC
 VOID
@@ -330,6 +354,7 @@ EFI_STATUS
 KmhAcpiParsePcieRcNodeFromDt (
   IN  FDT_CLIENT_PROTOCOL  *FdtClient,
   IN  INT32                Node,
+  IN  BOOLEAN              IsDwPcie,
   OUT KMH_DT_PCIE_RC_INFO  *RcInfo
   )
 {
@@ -343,9 +368,10 @@ KmhAcpiParsePcieRcNodeFromDt (
   }
 
   ZeroMem (RcInfo, sizeof (*RcInfo));
-  RcInfo->Node   = Node;
-  RcInfo->BusMin = 0;
-  RcInfo->BusMax = 0xff;
+  RcInfo->Node     = Node;
+  RcInfo->IsDwPcie = IsDwPcie;
+  RcInfo->BusMin   = 0;
+  RcInfo->BusMax   = 0xff;
 
   Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg", (CONST VOID **)&Property, &PropertySize);
   if (EFI_ERROR (Status) || (PropertySize < 4 * sizeof (UINT32))) {
@@ -412,8 +438,10 @@ KmhAcpiParsePcieRcNodeFromDt (
 
 STATIC
 EFI_STATUS
-KmhAcpiCollectPcieRcInfoFromDt (
+KmhAcpiCollectPcieRcInfoFromDtByMatch (
   IN  FDT_CLIENT_PROTOCOL   *FdtClient,
+  IN  CONST CHAR8           *MatchString,
+  IN  BOOLEAN               IsDwPcie,
   OUT KMH_DT_PCIE_RC_INFO   *RcInfo,
   IN  UINTN                 MaxRcCount,
   OUT UINTN                 *RcCount
@@ -424,19 +452,22 @@ KmhAcpiCollectPcieRcInfoFromDt (
   KMH_DT_PCIE_RC_INFO  Candidate;
   UINTN                Count;
 
-  if ((FdtClient == NULL) || (RcInfo == NULL) || (RcCount == NULL)) {
+  if ((FdtClient == NULL) || (MatchString == NULL) || (RcInfo == NULL) || (RcCount == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *RcCount = 0;
-  Count    = 0;
-  for (Status = FdtClient->FindCompatibleNode (FdtClient, "snps,dw-pcie", &Node);
+  Count = *RcCount;
+  for (Status = FdtClient->FindCompatibleNode (FdtClient, MatchString, &Node);
        !EFI_ERROR (Status);
-       Status = FdtClient->FindNextCompatibleNode (FdtClient, "snps,dw-pcie", Node, &Node))
+       Status = FdtClient->FindNextCompatibleNode (FdtClient, MatchString, Node, &Node))
   {
-    Status = KmhAcpiParsePcieRcNodeFromDt (FdtClient, Node, &Candidate);
+    if (KmhAcpiPcieRcNodeAlreadyCollected (RcInfo, Count, Node)) {
+      continue;
+    }
+
+    Status = KmhAcpiParsePcieRcNodeFromDt (FdtClient, Node, IsDwPcie, &Candidate);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "KMH-DT-PCIE: collect node=%d parse failed: %r\n", Node, Status));
+      DEBUG ((DEBUG_WARN, "KMH-DT-PCIE: collect %a node=%d parse failed: %r\n", MatchString, Node, Status));
       continue;
     }
 
@@ -453,11 +484,54 @@ KmhAcpiCollectPcieRcInfoFromDt (
   }
 
   *RcCount = Count;
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+KmhAcpiCollectPcieRcInfoFromDt (
+  IN  FDT_CLIENT_PROTOCOL   *FdtClient,
+  OUT KMH_DT_PCIE_RC_INFO   *RcInfo,
+  IN  UINTN                 MaxRcCount,
+  OUT UINTN                 *RcCount
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((FdtClient == NULL) || (RcInfo == NULL) || (RcCount == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *RcCount = 0;
+  Status = KmhAcpiCollectPcieRcInfoFromDtByMatch (
+             FdtClient,
+             "snps,dw-pcie",
+             TRUE,
+             RcInfo,
+             MaxRcCount,
+             RcCount
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = KmhAcpiCollectPcieRcInfoFromDtByMatch (
+             FdtClient,
+             "pci",
+             FALSE,
+             RcInfo,
+             MaxRcCount,
+             RcCount
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   DEBUG ((DEBUG_INFO, "KMH-DT-PCIE: collect enabled RC count=%u max=%u\n",
-    (UINT32)Count,
+    (UINT32)*RcCount,
     (UINT32)MaxRcCount
     ));
-  return (Count > 0) ? EFI_SUCCESS : EFI_NOT_FOUND;
+  return (*RcCount > 0) ? EFI_SUCCESS : EFI_NOT_FOUND;
 }
 
 STATIC
@@ -2514,6 +2588,14 @@ KmhAcpiPcieInitRc (
   UINT64  Mmio64PciBase;
   UINT64  Mmio64Size;
   UINT32  Vendor;
+
+  if ((RcInfo != NULL) && !RcInfo->IsDwPcie) {
+    DEBUG ((DEBUG_INFO, "KMH-ACPI-PCIE: %a skip DW hardware init, DT node=%d is generic device_type=\"pci\"\n",
+      RcName,
+      RcInfo->Node
+      ));
+    return;
+  }
 
   if ((RcInfo == NULL) || !RcInfo->Found || !RcInfo->FoundMmio32 || (RcInfo->DbiBase == 0) || (RcInfo->McfgBase == 0)) {
     DEBUG ((DEBUG_ERROR, "KMH-ACPI-PCIE: %a skip hardware init, DT PCIe resource incomplete\n", RcName));
